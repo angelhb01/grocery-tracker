@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Alert, StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native'
-import { supabase } from '../lib/supabase'
+import { supabase } from '@/lib/supabase'
+import { Link, router } from 'expo-router'
 
-export default function Auth() {
+export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -14,22 +15,11 @@ export default function Auth() {
       password: password,
     })
 
-    if (error) Alert.alert(error.message)
-    setLoading(false)
-  }
-
-  async function signUpWithEmail() {
-    setLoading(true)
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    })
-
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert('Please check your inbox for email verification!')
+    if (error){
+        Alert.alert(error.message)
+    } else {
+        router.replace('/(tabs)');
+    }
     setLoading(false)
   }
 
@@ -38,6 +28,7 @@ export default function Auth() {
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>Email</Text>
         <TextInput
+          autoComplete='email'
           onChangeText={(text) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
@@ -65,14 +56,9 @@ export default function Auth() {
           <Text style={styles.buttonText}>Sign in</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.verticallySpaced}>
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={() => signUpWithEmail()}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>Sign up</Text>
-        </TouchableOpacity>
+      <View className=''>
+        <Text className=''>Don't have an account?</Text>
+        <Link href={{pathname: '/(authentication)/signup'}}>Sign up here</Link>
       </View>
     </View>
   )
