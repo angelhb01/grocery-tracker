@@ -10,15 +10,22 @@ export default function Signup() {
 
   async function signUpWithEmail() {
     setLoading(true)
+
     const {
-      data: { session },
+      data: { session, user },
       error,
     } = await supabase.auth.signUp({
       email: email,
       password: password,
-    })
-    if (error) Alert.alert(error.message)
-    if (!session) Alert.alert('Please check your inbox for email verification!')
+    });
+    if (error) {
+      Alert.alert(error.message);
+    } else if (user?.identities?.length === 0){
+      Alert.alert('User is already registered. Please try to log in.')
+    } else if (!session) {
+      Alert.alert("Please check your inbox for email verification!")
+    }
+
     setLoading(false)
   }
 
