@@ -22,11 +22,9 @@ const Signout = () => {
   }
 
   return (
-    <View>
-      <Button disabled={loading} onPress={signOut} className={`bg-primary-0 h-[3.5rem]`} variant='solid' size='md' action='primary'>
-        <ButtonText>Sign Out</ButtonText>
-      </Button>
-    </View>
+    <Button disabled={loading} onPress={signOut} className={`bg-primary-0 h-[3.5rem]`} variant='solid' size='md' action='primary'>
+      <ButtonText>Sign Out</ButtonText>
+    </Button>
   )
 }
 
