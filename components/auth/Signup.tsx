@@ -1,37 +1,48 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Alert, StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native'
 import { supabase } from '@/lib/supabase'
 import { Link, router } from 'expo-router'
 
 export default function Signup() {
+  // Email and password are updated in the auth.users table
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+
   const [loading, setLoading] = useState(false)
 
+  // Fix: Prevent the user from adding spaces, empty values, etc. when they sign up.
   async function signUpWithEmail() {
     setLoading(true)
-
-    const {
-      data: { session, user },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
-    if (error) {
-      Alert.alert(error.message);
-    } else if (user?.identities?.length === 0){
-      Alert.alert('User is already registered. Please try to log in.')
-    } else if (!session) {
-      Alert.alert("Please check your inbox for email verification!")
+    try {
+      if (password === confirmPassword) {
+        const {
+          data: { session, user },
+          error,
+        } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+        });
+        if (error) {
+          Alert.alert(error.message);
+        } else if (user?.identities?.length === 0){
+          Alert.alert('User is already registered. Please try to log in.')
+        } else {
+          router.replace('/(authentication)/profileEdit');
+          //Alert.alert("Please check your inbox for email verification!")
+        }
+      } else {
+        Alert.alert('Passwords do not match. Please try again.')
+      }
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
+    <View style={styles.container} className='m-5 border-white shadow-sm rounded-md bg-white'>
+      <Text className='text-5xl text-center'>Sign Up</Text>
+      <View style={[styles.verticallySpaced]}>
         <Text style={styles.label}>Email</Text>
         <TextInput
           onChangeText={(text) => setEmail(text)}
@@ -53,6 +64,17 @@ export default function Signup() {
         />
       </View>
       <View style={styles.verticallySpaced}>
+        <Text style={styles.label}>Confirm Password</Text>
+        <TextInput
+          onChangeText={(text) => setConfirmPassword(text)}
+          value={confirmPassword}
+          secureTextEntry={true}
+          placeholder="Password"
+          autoCapitalize="none"
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.verticallySpaced}>
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={() => signUpWithEmail()}
@@ -62,7 +84,7 @@ export default function Signup() {
         </TouchableOpacity>
       </View>
       <Text>Already have an account?</Text>
-      <Link href={{pathname: '/(authentication)/login'}}>Login here</Link>
+      <Link href={{pathname: '/(authentication)/login'}} className='text-cyan-600'>Login here</Link>
     </View>
   )
 }
@@ -94,7 +116,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#2089dc',
+    backgroundColor: '#2E8B57',
     borderRadius: 4,
     padding: 12,
     alignItems: 'center',
