@@ -3,28 +3,57 @@ import { Alert, StyleSheet, View, Text, TextInput, TouchableOpacity } from 'reac
 import { supabase } from '@/lib/supabase'
 import { Link, router } from 'expo-router'
 
+// Checkpoint: prevent the user from navigating to the tabs unless they completed their profile (username, first_name, etc.)
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
+  async function onboarding(user_id: any) {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select()
+        .eq('id', user_id)
+
+      if (error) {
+        console.log(error.message)
+        return
+      } else {
+        console.log('Data:', data)
+        return data
+      }
+
+    } catch (error) {
+      console.log('An unknown error occurred:', error)
+      return
+    }
+  }
+
   async function signInWithEmail() {
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    })
+    try {
+      const {data: {user}, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      })
+      const onboardingData = await onboarding(user?.id);
 
-    if (error){
-        Alert.alert(error.message)
-    } else {
+      if (error) {
+          Alert.alert(error.message)
+      } else if (onboardingData![0].username === null || onboardingData![0].username === ''){
+        router.replace('/(authentication)/profileEdit');
+      } else {
         router.replace('/(tabs)');
+      }
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className='m-5 border-white shadow-sm rounded-md bg-white'>
+      <Text className='text-5xl text-center'>Sign In</Text>
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>Email</Text>
         <TextInput
@@ -58,7 +87,7 @@ export default function Login() {
       </View>
       <View className=''>
         <Text className=''>Don't have an account?</Text>
-        <Link href={{pathname: '/(authentication)/signup'}}>Sign up here</Link>
+        <Link href={{pathname: '/(authentication)/signup'}} className='text-cyan-600'>Sign up here</Link>
       </View>
     </View>
   )
@@ -91,7 +120,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#2089dc',
+    backgroundColor: '#2E8B57',
     borderRadius: 4,
     padding: 12,
     alignItems: 'center',

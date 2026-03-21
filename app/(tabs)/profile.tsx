@@ -11,7 +11,6 @@ const profile = () => {
         <DeleteBtn />
       </View>
     </SafeAreaView>
-
   )
 }
 
