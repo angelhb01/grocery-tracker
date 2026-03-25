@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Alert, StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native'
+import { Alert, StyleSheet, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
 import { supabase } from '@/lib/supabase'
 import { Link, router } from 'expo-router'
 
@@ -52,48 +52,49 @@ export default function Login() {
   }
 
   return (
-    <View style={styles.container} className='m-5 border-white shadow-sm rounded-md bg-white'>
-      <Text className='text-5xl text-center'>Sign In</Text>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          autoComplete='email'
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-          placeholder="email@address.com"
-          autoCapitalize="none"
-          style={styles.input}
-        />
+    <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <View style={styles.container} className='m-5 border-white shadow-sm rounded-md bg-white'>
+        <Text className='text-5xl text-center'>Sign In</Text>
+        <View style={[styles.verticallySpaced, styles.mt20]}>
+          <Text style={styles.label}>Email</Text>
+            <TextInput
+              autoComplete='email'
+              onChangeText={(text) => setEmail(text)}
+              value={email}
+              autoCapitalize="none"
+              style={styles.input}
+            />
+        </View>
+        <View style={styles.verticallySpaced}>
+          <Text style={styles.label}>Password</Text>
+            <TextInput
+              onChangeText={(text) => setPassword(text)}
+              value={password}
+              secureTextEntry={true}
+              autoCapitalize="none"
+              style={styles.input}
+            />
+        </View>
+        <View style={[styles.verticallySpaced, styles.mt20]}>
+          <TouchableOpacity
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={() => signInWithEmail()}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>Sign in</Text>
+          </TouchableOpacity>
+        </View>
+        <View className=''>
+          <Text className=''>Don't have an account?</Text>
+          <Link href={{pathname: '/(authentication)/signup'}} className='text-cyan-600'>Sign up here</Link>
+        </View>
       </View>
-      <View style={styles.verticallySpaced}>
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-          secureTextEntry={true}
-          placeholder="Password"
-          autoCapitalize="none"
-          style={styles.input}
-        />
-      </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={() => signInWithEmail()}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>Sign in</Text>
-        </TouchableOpacity>
-      </View>
-      <View className=''>
-        <Text className=''>Don't have an account?</Text>
-        <Link href={{pathname: '/(authentication)/signup'}} className='text-cyan-600'>Sign up here</Link>
-      </View>
-    </View>
+    </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
+
   container: {
     marginTop: 40,
     padding: 12,
