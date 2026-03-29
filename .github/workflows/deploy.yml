@@ -1,0 +1,54 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      # Public keys (safe to expose to client if needed)
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+
+      # Sensitive keys (must stay secret)
+      SUPABASE_SERVICE_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_KEY }}
+      SUPABASE_DATABASE_PASSWORD: ${{ secrets.SUPABASE_DATABASE_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+    steps:
+
+      # Checkout repo
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Install Expo CLI and EAS CLI globally
+      - name: Install Expo and EAS CLI
+        run: npm install -g expo-cli eas-cli
+
+      # Expo authentication (non-interactive)
+      - name: Authenticate with Expo
+        run: echo "Expo token set"
+
+      # Run Supabase migrations (applies your database schema)
+      - name: Run Supabase migrations
+        run: npx supabase db push
+
+      # Build the app
+      - name: EAS build
+        run: eas build --platform all --non-interactive
