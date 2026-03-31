@@ -2,7 +2,7 @@ import { View, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ProfileEdit from '@/components/auth/ProfleEdit'
 
-const profileEdit = () => {
+const ProfileEditScreen = () => {
   return (
     <SafeAreaView>
       <View>
@@ -13,4 +13,4 @@ const profileEdit = () => {
   )
 }
 
-export default profileEdit
+export default ProfileEditScreen

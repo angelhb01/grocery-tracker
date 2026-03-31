@@ -3,7 +3,7 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Login from '@/components/auth/Login';
 
-const login = () => {
+const LoginScreen = () => {
   return (
     <SafeAreaView className='h-full flex justify-center'>
       <View className='bg-green-400 h-[50%] absolute top-0 left-0 right-0' />
@@ -15,6 +15,6 @@ const login = () => {
   )
 }
 
-export default login
+export default LoginScreen
 
 const styles = StyleSheet.create({})

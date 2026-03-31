@@ -1,13 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
-const camera = () => {
+const CameraScreen = () => {
   return (
-    <View>
+    <SafeAreaView>
       <Text>camera</Text>
-    </View>
+    </SafeAreaView>
   )
 }
 
-export default camera
+export default CameraScreen
 
 const styles = StyleSheet.create({})

@@ -20,7 +20,6 @@ export default function Login() {
         console.log(error.message)
         return
       } else {
-        console.log('Data:', data)
         return data
       }
 
