@@ -45,6 +45,10 @@ jobs:
       # Expo authentication (non-interactive)
       - name: Authenticate with Expo
         run: echo "Expo token set"
+      
+      # Links to Supabase Project
+      - name: Link Supabase project
+        run: npx supabase link --project-ref $SUPABASE_PROJECT_ID
 
       # Run Supabase migrations (applies your database schema)
       - name: Run Supabase migrations
