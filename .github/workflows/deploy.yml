@@ -31,7 +31,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20
           cache: 'npm'
 
       # Install dependencies
@@ -44,7 +44,7 @@ jobs:
 
       # Expo authentication (non-interactive)
       - name: Authenticate with Expo
-        run: echo "Expo token set"
+        run: npx eas login --token $EXPO_TOKEN
       
       # Links to Supabase Project
       - name: Link Supabase project
@@ -54,6 +54,6 @@ jobs:
       - name: Run Supabase migrations
         run: npx supabase db push
 
-      # Build the app
-      - name: EAS build
-        run: eas build --platform all --non-interactive
+      # Publish an update to Expo Go
+      - name: Publish Update
+        run: npx eas update --auto --non-interactive
