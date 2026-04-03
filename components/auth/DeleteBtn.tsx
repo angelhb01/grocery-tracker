@@ -3,6 +3,8 @@ import { Button, ButtonText } from '../ui/button'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { router } from 'expo-router'
+import AntDesign from '@expo/vector-icons/AntDesign'
+import MaterialIcons from '@expo/vector-icons/MaterialIcons'
 
 export default function DeleteBtn() {
   const [loading, setLoading] = useState(false)
@@ -29,13 +31,13 @@ export default function DeleteBtn() {
   return (
       <Button disabled={loading} onPress={deleteUser} className='h-[3.5rem] justify-between items-center gap-10' variant='solid' size='md' action='primary'>
         <View>
-          <ButtonText>Img</ButtonText>
+          <AntDesign name='user-delete' size={32} />
         </View>
         <View className='mr-auto'>
           <ButtonText>Delete Account</ButtonText>
         </View>
         <View>
-          <ButtonText>Img</ButtonText>
+          <MaterialIcons name='keyboard-arrow-right' size={32} />
         </View>
       </Button>
   )

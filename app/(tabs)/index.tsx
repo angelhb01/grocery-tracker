@@ -10,15 +10,15 @@ export default function Index() {
       </View>
 
       {/* Grocery list */}
-      <View className="flex-1 p-10 justify-center">
-        <View className="bg-yellow-400 p-3 h-[80%] rounded-lg border-2 shadow-md">
+      <View className="flex-1 p-10 justify-center flex-col">
+        <View className="bg-yellow-400 p-3 h-[35rem] rounded-lg border-2 shadow-md">
           {/* Title */}
           <View className="flex flex-row justify-between mb-5">
             <Text className="text-2xl">Grocery list</Text>
             <Text className="text-2xl">Edit</Text>
           </View>
           {/* Content */}
-          <ScrollView className="flex-1">
+          <ScrollView className="">
             {/* List of Foods */}
             <View className="bg-yellow-500 h-20 mb-5">
               <Text>Apple</Text>
