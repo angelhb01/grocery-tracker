@@ -3,7 +3,6 @@ import { Alert, StyleSheet, View, Text, TextInput, TouchableOpacity, KeyboardAvo
 import { supabase } from '@/lib/supabase'
 import { Link, router } from 'expo-router'
 
-// Checkpoint: prevent the user from navigating to the tabs unless they completed their profile (username, first_name, etc.)
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
