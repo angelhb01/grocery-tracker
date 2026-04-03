@@ -5,7 +5,7 @@ export default function Index() {
   return (
     <SafeAreaView className="flex-1">
       {/* Header */}
-      <View className="p-5 border-b-2">
+      <View className="p-5 border-b-2 h-[6rem]">
         <Text className="text-3xl text-center">Grocery List</Text>
       </View>
 

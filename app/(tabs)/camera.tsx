@@ -1,11 +1,11 @@
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Button, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 const CameraScreen = () => {
-  const [facing, setFacing] = useState<CameraType>('back')
   const [permission, requestPermission] = useCameraPermissions();
+  const cameraRef = useRef<CameraView | null>(null);
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -22,16 +22,29 @@ const CameraScreen = () => {
     );
   }
 
-  function toggleCameraFacing() {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  // Breakpoint: Take pictures and show an image of the result to the screen.
+  async function takePicture() {
+    if (cameraRef.current) {
+      const photo = await cameraRef.current.takePictureAsync();
+      console.log(photo.uri)
+
+      return (
+        <View>
+          <Image 
+            source={{ uri: photo.uri}}
+            style={{ width: 200, height: 200 }}
+          />
+        </View>
+      )
+    }
   }
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing} />
+      <CameraView style={styles.camera} facing='back' ref={cameraRef} />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-          <Text style={styles.text}>Flip Camera</Text>
+        <TouchableOpacity style={styles.button} onPress={takePicture}>
+          <Text style={styles.text}>Take Picture</Text>
         </TouchableOpacity>
       </View>
     </View>

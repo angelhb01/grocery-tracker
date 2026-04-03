@@ -1,4 +1,4 @@
-import { Alert } from 'react-native'
+import { Alert, View } from 'react-native'
 import { Button, ButtonText } from '../ui/button'
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
@@ -27,8 +27,16 @@ export default function DeleteBtn() {
   }
 
   return (
-      <Button disabled={loading} onPress={deleteUser} className={`bg-primary-0 h-[3.5rem]`} variant='solid' size='md' action='primary'>
-      <ButtonText>Delete Account</ButtonText>
+      <Button disabled={loading} onPress={deleteUser} className='h-[3.5rem] justify-between items-center gap-10' variant='solid' size='md' action='primary'>
+        <View>
+          <ButtonText>Img</ButtonText>
+        </View>
+        <View className='mr-auto'>
+          <ButtonText>Delete Account</ButtonText>
+        </View>
+        <View>
+          <ButtonText>Img</ButtonText>
+        </View>
       </Button>
   )
 }
