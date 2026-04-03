@@ -22,8 +22,16 @@ const Signout = () => {
   }
 
   return (
-    <Button disabled={loading} onPress={signOut} className={`bg-primary-0 h-[3.5rem]`} variant='solid' size='md' action='primary'>
-      <ButtonText>Sign Out</ButtonText>
+    <Button disabled={loading} onPress={signOut} className='h-[3.5rem] flex flex-row items-center justify-between gap-10' variant='solid' size='md' action='primary'>
+      <View>
+        <ButtonText>Img</ButtonText>
+      </View>
+      <View className='mr-auto'>
+        <ButtonText>Log out</ButtonText>
+      </View>
+      <View>
+        <ButtonText>Img</ButtonText>
+      </View>
     </Button>
   )
 }
