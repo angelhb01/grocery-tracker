@@ -1,7 +1,27 @@
 import { StyleSheet, Text, View, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useEffect, useState } from 'react'
 
 const FoodScreen = () => {
+  const [loading, setLoading] = useState(false)
+
+  async function getFoodData() {
+    setLoading(true)
+    try{
+      const response = await fetch('/api/food');
+      const json = await response.json();
+      console.log(json);
+    } catch (e) {
+      console.log("Unexpected error occurred: "+e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getFoodData();
+  }, [])
+
   return (
     <SafeAreaView>
       {/* Header */}
