@@ -4,7 +4,7 @@ import SignOutBtn from '@/components/auth/SignoutBtn'
 import DeleteBtn from '@/components/auth/DeleteBtn'
 import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
-
+import { ActivityIndicator } from 'react-native'
 
 const ProfileScreen = () => {
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,6 @@ const ProfileScreen = () => {
         if (error) {
           console.log(error);
         } else {
-          console.log(data)
           setUsername(data[0].username)
           setFirstlName(data[0].first_name)
           setLastName(data[0].last_name)
@@ -38,7 +37,9 @@ const ProfileScreen = () => {
     } catch (e) {
       console.log("Unexpected error occurred: "+e)
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000)
     }
   }
 
@@ -48,15 +49,15 @@ const ProfileScreen = () => {
   }, [])
 
   return (
-    <SafeAreaView>
+    <SafeAreaView className='flex-1'>
       {/* Header */}
       <View className="p-5 border-b-2 h-[6rem]">
         <Text className="text-3xl text-center">Profile</Text>
       </View>
 
       {loading ? (
-        <View>
-          <Text>Loading...</Text>
+        <View className='flex-col flex-1 justify-center items-center'>
+          <ActivityIndicator color={'black'} />
         </View>
       ) : (
         <>
