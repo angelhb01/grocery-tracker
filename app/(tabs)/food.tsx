@@ -5,7 +5,7 @@ const FoodScreen = () => {
   return (
     <SafeAreaView>
       {/* Header */}
-      <View className="p-5 border-b-2">
+      <View className="p-5 border-b-2 h-[6rem]">
         <Text className="text-3xl text-center">Food</Text>
       </View>
       {/* Food content (from an API) */}
