@@ -2,8 +2,10 @@ import { Button, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-n
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera'
 import { useState, useRef } from 'react'
+import { useIsFocused } from '@react-navigation/native'
 
 const CameraScreen = () => {
+  const isFocused = useIsFocused();
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<CameraView | null>(null);
 
@@ -40,14 +42,20 @@ const CameraScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <CameraView style={styles.camera} facing='back' ref={cameraRef} />
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={takePicture}>
-          <Text style={styles.text}>Take Picture</Text>
-        </TouchableOpacity>
+    <>
+    {isFocused ? (
+      <View style={styles.container}>
+        <CameraView style={styles.camera} facing='back' ref={cameraRef} />
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={takePicture}>
+            <Text style={styles.text}>Take Picture</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    ) : (
+      <View />
+    )}
+    </>
   );
 }
 
