@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useEffect, useState } from 'react'
 import { ActivityIndicator } from 'react-native'
@@ -23,6 +23,7 @@ const FoodScreen = () => {
       setFoodData(json)
     } catch (e) {
       console.log("Unexpected error occurred: "+e)
+      Alert.alert(""+e)
     } finally {
       setLoading(false)
     }
