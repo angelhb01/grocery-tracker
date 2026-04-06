@@ -53,3 +53,15 @@ jobs:
       # Publish an update to Expo Go
       - name: Publish Update
         run: npx eas update --auto --non-interactive
+
+      # Create server bundle
+      - name: Create server bundle
+        run: npx expo export --platform web
+      
+      # Setup EAS hosting
+      - name: Setup EAS hosting
+        run: npx expo export -p web
+      
+      # Deploy app to EAS
+      - name: Deploy app to EAS
+        run: eas deploy
