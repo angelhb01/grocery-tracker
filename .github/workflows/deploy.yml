@@ -64,4 +64,4 @@ jobs:
       
       # Deploy app to EAS
       - name: Deploy app to EAS
-        run: eas deploy
+        run: eas deploy --prod
