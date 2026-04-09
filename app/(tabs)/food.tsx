@@ -1,9 +1,10 @@
 import { Button, ButtonText } from "@/components/ui/button";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -21,6 +22,15 @@ interface Food {
 const FoodScreen = () => {
   const [loading, setLoading] = useState(false);
   const [foodData, setFoodData] = useState<Array<Food>>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Scroll down to refresh
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   async function getFoodData() {
     setLoading(true);
@@ -47,23 +57,33 @@ const FoodScreen = () => {
         <Text className="text-3xl text-center">Food</Text>
       </View>
       {/* Food content (from an API) */}
-      <ScrollView contentContainerStyle={{ flexGrow: 1, gap: 10, padding: 10 }}>
-        {loading ? (
-          <View>
-            <ActivityIndicator color={"black"} />
-          </View>
-        ) : (
-          foodData.map((food) => (
+      {loading ? (
+        <View>
+          <ActivityIndicator color={"black"} />
+        </View>
+      ) : (
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          contentContainerStyle={{ flexGrow: 1, gap: 10, padding: 10 }}
+        >
+          {foodData.map((food) => (
             <Button
-              onPress={() => router.replace("/FoodInfo")}
+              onPress={() =>
+                router.push({
+                  pathname: "/FoodInfo",
+                  params: { description: food.description },
+                })
+              }
               className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black"
               key={food.fdcId}
             >
               <ButtonText>{food.description}</ButtonText>
             </Button>
-          ))
-        )}
-      </ScrollView>
+          ))}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
