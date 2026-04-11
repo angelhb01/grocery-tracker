@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import ProfileEdit from '@/components/auth/ProfleEdit'
+import ProfileEdit from '@/components/auth/ProfileEdit'
 
 const ProfileEditScreen = () => {
   return (
