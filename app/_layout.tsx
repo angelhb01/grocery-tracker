@@ -26,18 +26,18 @@ export default function RootLayout() {
         />
         <Stack.Protected guard={hasSession}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="FoodInfo"
+            options={{
+              title: "Details",
+              headerBackButtonDisplayMode: "minimal",
+              presentation: "formSheet",
+              sheetAllowedDetents: [0.7],
+              sheetGrabberVisible: true,
+              headerShown: false,
+            }}
+          />
         </Stack.Protected>
-        <Stack.Screen
-          name="FoodInfo"
-          options={{
-            title: "Details",
-            headerBackButtonDisplayMode: "minimal",
-            presentation: "formSheet",
-            sheetAllowedDetents: [0.7],
-            sheetGrabberVisible: true,
-            headerShown: false,
-          }}
-        />
       </Stack>
     </GluestackUIProvider>
   );
