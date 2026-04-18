@@ -22,6 +22,7 @@ const ProfileScreen = () => {
 
   // Get user's username
   async function getUsername() {
+    setLoading(true);
     try {
       const {
         data: { user },
@@ -54,7 +55,6 @@ const ProfileScreen = () => {
   }
 
   useEffect(() => {
-    setLoading(true);
     getUsername();
   }, []);
 

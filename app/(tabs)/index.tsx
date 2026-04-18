@@ -1,9 +1,17 @@
 import { supabase } from "@/lib/supabase";
 import { useCallback, useEffect, useState } from "react";
-import { Alert, RefreshControl, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Groceries {
+  id: number;
   product_name: string;
   product_desc: string;
   quantity: number;
@@ -23,8 +31,6 @@ export default function Index() {
   }, []);
 
   async function loadGroceries() {
-    setLoading(true);
-
     try {
       const {
         data: { user },
@@ -34,7 +40,7 @@ export default function Index() {
       if (user) {
         const { data, error } = await supabase
           .from("groceries")
-          .select("product_name, product_desc, quantity")
+          .select("id, product_name, product_desc, quantity")
           .eq("uuid", user.id);
 
         if (error) {
@@ -49,14 +55,20 @@ export default function Index() {
     } catch (e) {
       Alert.alert("" + e);
       console.log(e);
-    } finally {
-      setLoading(false);
     }
   }
 
+  // Initital groceries list rendered
+  useEffect(() => {
+    setLoading(true)
+    loadGroceries();
+    setLoading(false)
+  }, []);
+
+  // Refresh groceries list
   useEffect(() => {
     loadGroceries();
-  }, []);
+  }, [refreshing])
 
   return (
     <SafeAreaView className="flex-1">
@@ -66,35 +78,26 @@ export default function Index() {
       </View>
 
       {/* Grocery list */}
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, gap: 10, padding: 10 }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {/* List of Foods */}
-        <View className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black">
-          <Text>Apple</Text>
-        </View>
-        <View className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black">
-          <Text>Apple</Text>
-        </View>
-        <View className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black">
-          <Text>Apple</Text>
-        </View>
-        <View className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black">
-          <Text>Apple</Text>
-        </View>
-        <View className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black">
-          <Text>Apple</Text>
-        </View>
-        <View className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black">
-          <Text>Apple</Text>
-        </View>
-        <View className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black">
-          <Text>Apple</Text>
-        </View>
-      </ScrollView>
+      {loading ? (
+        <ActivityIndicator color={"black"} />
+      ) : (
+        /* List of Foods */
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1, gap: 10, padding: 10 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {groceries?.map((item) => (
+            <View
+              className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black"
+              key={item.id}
+            >
+              <Text>{item.product_desc}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }

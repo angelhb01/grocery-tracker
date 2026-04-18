@@ -1,4 +1,5 @@
 import { Button, ButtonText } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -21,8 +22,10 @@ interface Food {
 
 const FoodScreen = () => {
   const [loading, setLoading] = useState(false);
+  const [foodLoading, setFoodLoading] = useState(false);
   const [foodData, setFoodData] = useState<Array<Food>>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [user, setUser] = useState<string>();
 
   // Scroll down to refresh
   const onRefresh = useCallback(() => {
@@ -33,7 +36,7 @@ const FoodScreen = () => {
   }, []);
 
   async function getFoodData() {
-    setLoading(true);
+    setFoodLoading(true);
     try {
       const response = await fetch("/api/food");
       const json = await response.json();
@@ -42,11 +45,32 @@ const FoodScreen = () => {
       console.log("Unexpected error occurred: " + e);
       Alert.alert("" + e);
     } finally {
+      setFoodLoading(false);
+    }
+  }
+
+  async function getUserData() {
+    setLoading(true);
+    try {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user.id)
+        console.log(user.id)
+      } else {
+        console.log(error);
+      }
+    } catch (e) {
+      console.log(e)
+    } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
+    getUserData();
     getFoodData();
   }, []);
 
@@ -57,7 +81,7 @@ const FoodScreen = () => {
         <Text className="text-3xl text-center">Food</Text>
       </View>
       {/* Food content (from an API) */}
-      {loading ? (
+      {foodLoading || loading ? (
         <View>
           <ActivityIndicator color={"black"} />
         </View>
@@ -73,7 +97,7 @@ const FoodScreen = () => {
               onPress={() =>
                 router.push({
                   pathname: "/FoodInfo",
-                  params: { description: food.description },
+                  params: { description: food.description, user: user},
                 })
               }
               className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black"
