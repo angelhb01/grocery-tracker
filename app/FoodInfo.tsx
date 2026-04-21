@@ -7,7 +7,7 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const FoodInfo = () => {
-  const { description, user } = useLocalSearchParams();
+  const { name, brand_name, type, description, user } = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
 
   async function addToGroceries() {
@@ -34,7 +34,7 @@ const FoodInfo = () => {
           .insert([{ uuid: user, product_desc: description, quantity: 1 }]);
         Alert.alert("Success");
       } else {
-        Alert.alert("Successfully added to groceries")
+        Alert.alert("Successfully added to groceries");
         console.log(error);
       }
     } catch (e) {
@@ -47,6 +47,14 @@ const FoodInfo = () => {
   return (
     <SafeAreaView className="p-10 flex-col gap-5 justify-center h-full">
       {/* Description Header */}
+      <View>
+        <Text>Name:</Text>
+        <Text>{name}{" "}{brand_name}</Text>
+      </View>
+      <View>
+        <Text>Type:</Text>
+        <Text>{type}</Text>
+      </View>
       <View>
         <Text>Description:</Text>
         <Text>{description}</Text>

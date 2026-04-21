@@ -60,15 +60,15 @@ export default function Index() {
 
   // Initital groceries list rendered
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     loadGroceries();
-    setLoading(false)
+    setLoading(false);
   }, []);
 
   // Refresh groceries list
   useEffect(() => {
     loadGroceries();
-  }, [refreshing])
+  }, [refreshing]);
 
   return (
     <SafeAreaView className="flex-1">
