@@ -1,32 +1,42 @@
-import React, { useState } from 'react'
-import { Alert, StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native'
-import { supabase } from '@/lib/supabase'
-import { Link, router } from 'expo-router'
+import { supabase } from "@/lib/supabase";
+import { router } from "expo-router";
+import React, { useState } from "react";
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function ProfileEdit() {
   const [loading, setLoading] = useState(false);
 
   // firstName, lastName, username are updated in the public.profiles table
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [username, setUsername] = useState('')
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
 
   async function getUserId() {
     try {
-      const { data: {user}, error } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
       if (error) {
-        console.log(error.message)
+        console.log(error.message);
         return null;
       }
       if (user) {
-        console.log('Current user ID:', user.id)
-        return user.id
+        console.log("Current user ID:", user.id);
+        return user.id;
       } else {
-        console.log('No user currently signed in');
+        console.log("No user currently signed in");
         return null;
       }
     } catch (error) {
-      console.log('Unexpected error occurred', error)
+      console.log("Unexpected error occurred", error);
     }
   }
 
@@ -36,18 +46,26 @@ export default function ProfileEdit() {
     try {
       const user_id = await getUserId();
       const { data, error } = await supabase
-        .from('profiles')
-        .update({ first_name: firstName, last_name: lastName, username: username })
-        .eq('id', user_id)
-        .select()
+        .from("profiles")
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+          username: username,
+        })
+        .eq("id", user_id)
+        .select();
 
       if (error) {
-        console.log(error)
-      } else if (firstName.trim() === '' || lastName.trim() === '' || username.trim() === '') {
+        console.log(error);
+      } else if (
+        firstName.trim() === "" ||
+        lastName.trim() === "" ||
+        username.trim() === ""
+      ) {
         // Issue with else if() statement: prevent the user from inserting invalid credenetials('', ' ', etc.)
-        Alert.alert('Invalid Credentials');
+        Alert.alert("Invalid Credentials");
       } else {
-        router.replace('/(tabs)')
+        router.replace("/(tabs)");
       }
     } finally {
       setLoading(false);
@@ -96,7 +114,7 @@ export default function ProfileEdit() {
         </TouchableOpacity>
       </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -107,36 +125,36 @@ const styles = StyleSheet.create({
   verticallySpaced: {
     paddingTop: 4,
     paddingBottom: 4,
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
   },
   mt20: {
     marginTop: 20,
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#86939e',
+    fontWeight: "600",
+    color: "#86939e",
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#86939e',
+    borderColor: "#86939e",
     borderRadius: 4,
     padding: 12,
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#2089dc',
+    backgroundColor: "#2089dc",
     borderRadius: 4,
     padding: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonDisabled: {
     opacity: 0.5,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
-})
+});

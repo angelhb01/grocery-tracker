@@ -18,7 +18,7 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <GluestackUIProvider mode="dark">
+    <GluestackUIProvider mode="system">
       <Stack>
         <Stack.Screen
           name="(authentication)"
@@ -27,11 +27,10 @@ export default function RootLayout() {
         <Stack.Protected guard={hasSession}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
-            name="FoodInfo"
+            name="(screens)"
             options={{
-              title: "Details",
               headerBackButtonDisplayMode: "minimal",
-              presentation: "formSheet",
+              presentation: "modal",
               sheetAllowedDetents: [0.7],
               sheetGrabberVisible: true,
               headerShown: false,

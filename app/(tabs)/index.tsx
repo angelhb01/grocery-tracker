@@ -1,4 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
+import { Entypo } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,6 +17,7 @@ interface Groceries {
   id: number;
   product_name: string;
   product_desc: string;
+  brand_name: string;
   quantity: number;
 }
 
@@ -40,7 +44,7 @@ export default function Index() {
       if (user) {
         const { data, error } = await supabase
           .from("groceries")
-          .select("id, product_name, product_desc, quantity")
+          .select("id, product_name, product_desc, brand_name, quantity")
           .eq("uuid", user.id);
 
         if (error) {
@@ -77,6 +81,13 @@ export default function Index() {
         <Text className="text-3xl text-center">Grocery List</Text>
       </View>
 
+      {/* Add your own food */}
+      <View className="">
+        <Button onPress={() => router.push({ pathname: "/addFood" })}>
+          <Entypo name="circle-with-plus" size={32} color="black" />
+        </Button>
+      </View>
+
       {/* Grocery list */}
       {loading ? (
         <ActivityIndicator color={"black"} />
@@ -90,10 +101,16 @@ export default function Index() {
         >
           {groceries?.map((item) => (
             <View
-              className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black"
+              className="min-h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black"
               key={item.id}
             >
+              <Text>
+                Name: {item.product_name}{" "}
+                {`${item.brand_name ? `(${item.brand_name})` : ""}`}
+              </Text>
+              <Text>Description:</Text>
               <Text>{item.product_desc}</Text>
+              <Text>Quantity: {item.quantity}</Text>
             </View>
           ))}
         </ScrollView>
