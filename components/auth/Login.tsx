@@ -1,77 +1,99 @@
-import React, { useState } from 'react'
-import { Alert, StyleSheet, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native'
-import { supabase } from '@/lib/supabase'
-import { Link, router } from 'expo-router'
+import { supabase } from "@/lib/supabase";
+import { Link, router } from "expo-router";
+import React, { useState } from "react";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function onboarding(user_id: any) {
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from("profiles")
         .select()
-        .eq('id', user_id)
+        .eq("id", user_id);
 
       if (error) {
-        console.log(error.message)
-        return
+        console.log(error.message);
+        return;
       } else {
-        return data
+        return data;
       }
-
     } catch (error) {
-      console.log('An unknown error occurred:', error)
-      return
+      console.log("An unknown error occurred:", error);
+      return;
     }
   }
 
   async function signInWithEmail() {
-    setLoading(true)
+    setLoading(true);
     try {
-      const {data: {user}, error } = await supabase.auth.signInWithPassword({
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
-      })
+      });
       const onboardingData = await onboarding(user?.id);
 
       if (error) {
-          Alert.alert(error.message)
-      } else if (onboardingData![0].username === null || onboardingData![0].username === ''){
-        router.replace('/(authentication)/profileEdit');
+        Alert.alert(error.message);
+      } else if (
+        onboardingData![0].username === null ||
+        onboardingData![0].username === ""
+      ) {
+        router.replace("/(authentication)/profileEdit");
       } else {
-        router.replace('/(tabs)');
+        router.replace("/(tabs)");
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
-    <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <View style={styles.container} className='m-5 border-white shadow-sm rounded-md bg-white'>
-        <Text className='text-5xl text-center'>Sign In</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <View
+        style={styles.container}
+        className="m-5 border-white shadow-sm rounded-md bg-white"
+      >
+        <Text className="text-5xl text-center">Sign In</Text>
         <View style={[styles.verticallySpaced, styles.mt20]}>
           <Text style={styles.label}>Email</Text>
-            <TextInput
-              autoComplete='email'
-              onChangeText={(text) => setEmail(text)}
-              value={email}
-              autoCapitalize="none"
-              style={styles.input}
-            />
+          <TextInput
+            className="text-black"
+            autoComplete="email"
+            onChangeText={(text) => setEmail(text)}
+            value={email}
+            autoCapitalize="none"
+            style={styles.input}
+          />
         </View>
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Password</Text>
-            <TextInput
-              onChangeText={(text) => setPassword(text)}
-              value={password}
-              secureTextEntry={true}
-              autoCapitalize="none"
-              style={styles.input}
-            />
+          <TextInput
+            className="text-black"
+            onChangeText={(text) => setPassword(text)}
+            value={password}
+            secureTextEntry={true}
+            autoCapitalize="none"
+            style={styles.input}
+          />
         </View>
         <View style={[styles.verticallySpaced, styles.mt20]}>
           <TouchableOpacity
@@ -82,17 +104,21 @@ export default function Login() {
             <Text style={styles.buttonText}>Sign in</Text>
           </TouchableOpacity>
         </View>
-        <View className=''>
-          <Text className=''>Don't have an account?</Text>
-          <Link href={{pathname: '/(authentication)/signup'}} className='text-cyan-600'>Sign up here</Link>
+        <View className="">
+          <Text className="">Don't have an account?</Text>
+          <Link
+            href={{ pathname: "/(authentication)/signup" }}
+            className="text-cyan-600"
+          >
+            Sign up here
+          </Link>
         </View>
       </View>
     </KeyboardAvoidingView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     marginTop: 40,
     padding: 12,
@@ -100,36 +126,36 @@ const styles = StyleSheet.create({
   verticallySpaced: {
     paddingTop: 4,
     paddingBottom: 4,
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
   },
   mt20: {
     marginTop: 20,
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#86939e',
+    fontWeight: "600",
+    color: "#86939e",
     marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#86939e',
+    borderColor: "#86939e",
     borderRadius: 4,
     padding: 12,
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#2E8B57',
+    backgroundColor: "#2E8B57",
     borderRadius: 4,
     padding: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonDisabled: {
     opacity: 0.5,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
-})
+});

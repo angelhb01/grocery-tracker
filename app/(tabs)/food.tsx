@@ -1,14 +1,15 @@
 import { Button, ButtonText } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  RefreshControl,
-  ScrollView,
+  FlatList,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,6 +24,7 @@ interface FoodInfo {
 
 const FoodScreen = () => {
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [foodLoading, setFoodLoading] = useState(false);
   const [foodData, setFoodData] = useState<FoodInfo[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -39,7 +41,7 @@ const FoodScreen = () => {
   async function getFoodData() {
     setFoodLoading(true);
     try {
-      const response = await fetch("/api/food?q=");
+      const response = await fetch(`/api/food?q=${searchTerm}`);
       const json = await response.json();
       console.log("Data response:", json);
       setFoodData(json.foods.food);
@@ -86,42 +88,58 @@ const FoodScreen = () => {
       <View className="p-5 border-b-2 h-[6rem]">
         <Text className="text-3xl text-center">Food</Text>
       </View>
+      {/* Search Bar */}
+      <View className="flex flex-row w-full">
+        <TextInput
+          className="bg-white w-3/4"
+          onChangeText={(text) => setSearchTerm(text)}
+          value={searchTerm}
+          autoCapitalize="none"
+        />
+        <Button className="w-1/4 bg-green-400" onPress={getFoodData}>
+          <FontAwesome5 name="search" size={32} color="black" />
+        </Button>
+      </View>
       {/* Food content (from an API) */}
       {foodLoading ? (
-        <View>
+        <SafeAreaView className="">
           <ActivityIndicator color={"black"} />
-        </View>
+        </SafeAreaView>
       ) : (
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          contentContainerStyle={{ flexGrow: 1, gap: 10, padding: 10 }}
-        >
-          {foodData.map((food) => (
-            <Button
-              onPress={() =>
-                router.push({
-                  pathname: "/FoodInfo",
-                  params: {
-                    name: food.food_name,
-                    brand_name: `${food.brand_name ? `(${food.brand_name})` : ""}`,
-                    type: food.food_type,
-                    description: food.food_description,
-                    user: user,
-                  },
-                })
-              }
-              className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black"
-              key={food.food_id}
-            >
-              <ButtonText>
-                {food.food_name}{" "}
-                {`${food.brand_name ? `(${food.brand_name})` : ""}`}
-              </ButtonText>
-            </Button>
-          ))}
-        </ScrollView>
+        <View className="flex flex-1">
+          <FlatList
+            contentContainerStyle={{ gap: 10, padding: 10 }}
+            data={foodData}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            renderItem={(food) => (
+              <>
+                <Button
+                  onPress={() =>
+                    router.push({
+                      pathname: "/foodInfo",
+                      params: {
+                        food_id: food.item.food_id,
+                        name: food.item.food_name,
+                        brand_name: `${food.item.brand_name ? `${food.item.brand_name}` : ""}`,
+                        type: food.item.food_type,
+                        description: food.item.food_description,
+                        user: user,
+                      },
+                    })
+                  }
+                  className="h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black"
+                  key={food.item.food_id}
+                >
+                  <ButtonText>
+                    {food.item.food_name}{" "}
+                    {`${food.item.brand_name ? `(${food.item.brand_name})` : ""}`}
+                  </ButtonText>
+                </Button>
+              </>
+            )}
+          />
+        </View>
       )}
     </SafeAreaView>
   );
