@@ -1,7 +1,7 @@
 import { Button, ButtonText } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,15 +22,20 @@ const FoodInfo = () => {
         .single();
 
       if (existing) {
-        await supabase
+        const { data, error } = await supabase
           .from("groceries")
           .update({ quantity: existing.quantity + 1 })
           .eq("uuid", user)
           .eq("id", food_id);
 
-        Alert.alert("Successfully added to groceries");
+        if (error) {
+          Alert.alert("Unexpected Error Occurred");
+        } else {
+          Alert.alert("Successfully Added to Groceries");
+          router.back();
+        }
       } else if (!existing) {
-        await supabase.from("groceries").insert([
+        const { data, error } = await supabase.from("groceries").insert([
           {
             id: food_id,
             uuid: user,
@@ -41,12 +46,18 @@ const FoodInfo = () => {
             quantity: 1,
           },
         ]);
-        Alert.alert("Successfully added to groceries");
+        if (error) {
+          Alert.alert("Unexpected Error Occurred");
+        } else {
+          Alert.alert("Successfully added to groceries");
+          router.back();
+        }
       } else {
         Alert.alert(error);
         console.log(error);
       }
     } catch (e) {
+      Alert.alert("Unexpected Error Occurred");
       console.log(e);
     } finally {
       setLoading(false);
