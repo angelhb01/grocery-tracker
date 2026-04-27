@@ -17,7 +17,6 @@ interface Groceries {
   id: number;
   product_name: string;
   product_desc: string;
-  brand_name: string;
   quantity: number;
 }
 
@@ -44,14 +43,14 @@ export default function Index() {
       if (user) {
         const { data, error } = await supabase
           .from("groceries")
-          .select("id, product_name, product_desc, brand_name, quantity")
+          .select("id, product_name, product_desc, quantity")
           .eq("uuid", user.id);
 
         if (error) {
           console.log(error);
         } else {
           setGroceries(data);
-          console.log(data);
+          //console.log(data);
         }
       } else {
         console.log(error);
@@ -90,11 +89,13 @@ export default function Index() {
 
       {/* Grocery list */}
       {loading ? (
-        <ActivityIndicator color={"black"} />
+        <View>
+          <ActivityIndicator color={"black"} />
+        </View>
       ) : (
         /* List of Foods */
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, gap: 10, padding: 10 }}
+          contentContainerClassName="flex-grow-1 gap-5 p-5"
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -104,10 +105,7 @@ export default function Index() {
               className="min-h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black"
               key={item.id}
             >
-              <Text>
-                Name: {item.product_name}{" "}
-                {`${item.brand_name ? `(${item.brand_name})` : ""}`}
-              </Text>
+              <Text>Name: {item.product_name}</Text>
               <Text>Description:</Text>
               <Text>{item.product_desc}</Text>
               <Text>Quantity: {item.quantity}</Text>

@@ -71,6 +71,7 @@ const ProfileScreen = () => {
         </View>
       ) : (
         <ScrollView
+          contentContainerClassName="flex-1"
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
