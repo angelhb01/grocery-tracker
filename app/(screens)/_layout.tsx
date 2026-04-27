@@ -7,7 +7,6 @@ const ScreensLayout = () => {
     <GluestackUIProvider mode="system">
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="addFood" />
-        <Stack.Screen name="foodInfo" />
       </Stack>
     </GluestackUIProvider>
   );
