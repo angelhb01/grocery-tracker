@@ -1,4 +1,3 @@
-import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import "@/global.css";
 import { supabase } from "@/lib/supabase";
 import { Stack } from "expo-router";
@@ -18,26 +17,21 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <GluestackUIProvider mode="system">
-      <Stack>
+    <Stack>
+      <Stack.Screen name="(authentication)" options={{ headerShown: false }} />
+      <Stack.Protected guard={hasSession}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
-          name="(authentication)"
-          options={{ headerShown: false }}
+          name="(screens)"
+          options={{
+            headerBackButtonDisplayMode: "minimal",
+            presentation: "modal",
+            sheetAllowedDetents: [0.7],
+            sheetGrabberVisible: true,
+            headerShown: false,
+          }}
         />
-        <Stack.Protected guard={hasSession}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="(screens)"
-            options={{
-              headerBackButtonDisplayMode: "minimal",
-              presentation: "modal",
-              sheetAllowedDetents: [0.7],
-              sheetGrabberVisible: true,
-              headerShown: false,
-            }}
-          />
-        </Stack.Protected>
-      </Stack>
-    </GluestackUIProvider>
+      </Stack.Protected>
+    </Stack>
   );
 }

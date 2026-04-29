@@ -14,23 +14,26 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 interface FoodData {
   calories: number;
-  fat: number;
   carbs: number;
+  fat: number;
   protein: number;
   quantity: number;
+}
+
+interface PieData {
+  value: number;
+  color: string;
 }
 
 const AnalyticsScreen = () => {
   const [loading, setLoading] = useState(false);
   const [foodData, setFoodData] = useState<FoodData[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(false);
 
-  const [pieData, setPieData] = useState([
-    { value: 1229, color: "#177AD5" },
-    { value: 200, color: "#79D2DE" },
-    { value: 242, color: "#ED6665" },
-    { value: 140, color: "yellow" },
-  ]);
+  const [pieData, setPieData] = useState<PieData[]>([]);
+
+  const [dataTotal, setDataTotal] = useState(0);
 
   // Scroll down to refresh
   const onRefresh = useCallback(() => {
@@ -39,6 +42,46 @@ const AnalyticsScreen = () => {
       setRefreshing(false);
     }, 2000);
   }, []);
+
+  // Update latest information about the food
+  function updateAnalytics(data: FoodData[]) {
+    // Add the total value of all the nutrients
+    setDataTotal(
+      data.reduce((total, curr) => {
+        return (
+          (total + curr.calories + curr.carbs + curr.fat + curr.protein) *
+          curr.quantity
+        );
+      }, 0),
+    );
+
+    setPieData([
+      {
+        value: data.reduce((total, curr) => {
+          return (total + curr.calories) * curr.quantity;
+        }, 0),
+        color: "#177ad5",
+      },
+      {
+        value: data.reduce((total, curr) => {
+          return (total + curr.fat) * curr.quantity;
+        }, 0),
+        color: "#79D2DE",
+      },
+      {
+        value: data.reduce((total, curr) => {
+          return (total + curr.carbs) * curr.quantity;
+        }, 0),
+        color: "#ED6665",
+      },
+      {
+        value: data.reduce((total, curr) => {
+          return (total + curr.protein) * curr.quantity;
+        }, 0),
+        color: "yellow",
+      },
+    ]);
+  }
 
   async function getFoodData(id: string) {
     try {
@@ -51,7 +94,8 @@ const AnalyticsScreen = () => {
         Alert.alert("Unexpected Error Occurred");
       } else {
         setFoodData(data);
-        console.log(foodData);
+        updateAnalytics(data);
+        console.log(data);
       }
     } catch (e) {
       Alert.alert("Unexpected Error Occurred");
@@ -60,14 +104,15 @@ const AnalyticsScreen = () => {
   }
 
   async function getUserData() {
-    setLoading(true);
     try {
+      setLoading(true);
       const {
         data: { user },
         error,
       } = await supabase.auth.getUser();
       if (user) {
-        console.log("User:", user.id);
+        //console.log("User:", user.id);
+        //console.log(userID);
         getFoodData(user.id);
       } else {
         Alert.alert("Unexpected Error Occurred");
@@ -83,7 +128,14 @@ const AnalyticsScreen = () => {
 
   useEffect(() => {
     getUserData();
+    setTimeout(() => {
+      setInitialLoad(true);
+    }, 1000);
   }, []);
+
+  useEffect(() => {
+    getUserData();
+  }, [refreshing]);
 
   return (
     <SafeAreaView className="flex-1">
@@ -92,7 +144,7 @@ const AnalyticsScreen = () => {
         <Text className="text-3xl text-center">Analytics</Text>
       </View>
       {/* Food Analytics */}
-      {loading ? (
+      {loading && !initialLoad ? (
         <View className="flex-col flex-1 justify-center items-center">
           <ActivityIndicator color={"black"} />
         </View>
@@ -113,48 +165,116 @@ const AnalyticsScreen = () => {
             <View className="flex-col">
               <View className="flex-row justify-between">
                 <Text>Calories</Text>
-                <Text>1229</Text>
+                <Text>
+                  {(
+                    (foodData.reduce((total, curr) => {
+                      return (total + curr.calories) * curr.quantity;
+                    }, 0) /
+                      dataTotal) *
+                    100
+                  ).toFixed(2)}
+                  %
+                </Text>
               </View>
               <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
                 <View
                   className={`bg-blue-500 h-full`}
-                  style={{ width: `70%` }}
+                  style={{
+                    width: `${
+                      (foodData.reduce((total, curr) => {
+                        return (total + curr.calories) * curr.quantity;
+                      }, 0) /
+                        dataTotal) *
+                      100
+                    }%`,
+                  }}
                 />
               </View>
             </View>
             <View className="flex-col">
               <View className="flex-row justify-between">
                 <Text>Carbs</Text>
-                <Text>15.2g</Text>
+                <Text>
+                  {(
+                    (foodData.reduce((total, curr) => {
+                      return (total + curr.carbs) * curr.quantity;
+                    }, 0) /
+                      dataTotal) *
+                    100
+                  ).toFixed(2)}
+                  %
+                </Text>
               </View>
               <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
                 <View
                   className={`bg-red-500 h-full`}
-                  style={{ width: `30%` }}
+                  style={{
+                    width: `${
+                      (foodData.reduce((total, curr) => {
+                        return (total + curr.carbs) * curr.quantity;
+                      }, 0) /
+                        dataTotal) *
+                      100
+                    }%`,
+                  }}
                 />
               </View>
             </View>
             <View className="flex-col">
               <View className="flex-row justify-between">
                 <Text>Fat</Text>
-                <Text>10.5g</Text>
+                <Text>
+                  {(
+                    (foodData.reduce((total, curr) => {
+                      return (total + curr.fat) * curr.quantity;
+                    }, 0) /
+                      dataTotal) *
+                    100
+                  ).toFixed(2)}
+                  %
+                </Text>
               </View>
               <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
                 <View
                   className={`bg-cyan-500 h-full`}
-                  style={{ width: `20%` }}
+                  style={{
+                    width: `${
+                      (foodData.reduce((total, curr) => {
+                        return (total + curr.fat) * curr.quantity;
+                      }, 0) /
+                        dataTotal) *
+                      100
+                    }%`,
+                  }}
                 />
               </View>
             </View>
             <View className="flex-col">
               <View className="flex-row justify-between">
                 <Text>Protein</Text>
-                <Text>140g</Text>
+                <Text>
+                  {(
+                    (foodData.reduce((total, curr) => {
+                      return (total + curr.protein) * curr.quantity;
+                    }, 0) /
+                      dataTotal) *
+                    100
+                  ).toFixed(2)}
+                  %
+                </Text>
               </View>
               <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
                 <View
-                  className={`bg-blue-500 h-full`}
-                  style={{ width: `40%` }}
+                  className={`bg-yellow-500 h-full`}
+                  style={{
+                    width: `${
+                      (foodData.reduce((total, curr) => {
+                        return (total + curr.protein) * curr.quantity;
+                      }, 0) /
+                        dataTotal) *
+                      100
+                    }%`,
+                  }}
                 />
               </View>
             </View>
