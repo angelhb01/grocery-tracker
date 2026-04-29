@@ -65,7 +65,9 @@ export default function Index() {
   useEffect(() => {
     setLoading(true);
     loadGroceries();
-    setLoading(false);
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   }, []);
 
   // Refresh groceries list

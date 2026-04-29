@@ -96,7 +96,7 @@ const AddFood = () => {
           <Text className="text-red-500">*</Text>
         </Text>
         <TextInput
-          className="bg-white h-12 p-2 border-[1px] rounded-md"
+          className="bg-white text-black h-12 p-2 border-[1px] rounded-md"
           value={productName}
           onChangeText={(text) => setProductName(text)}
           autoCapitalize="none"
@@ -105,7 +105,7 @@ const AddFood = () => {
       <View className="flex-col gap-1">
         <Text>Description:</Text>
         <TextInput
-          className="bg-white h-12 p-2 border-[1px] rounded-md"
+          className="bg-white text-black h-12 p-2 border-[1px] rounded-md"
           value={productDescription}
           onChangeText={(text) => setProductDescription(text)}
           autoCapitalize="none"
@@ -117,6 +117,11 @@ const AddFood = () => {
           <Text className="text-red-500">*</Text>
         </Text>
         <DropDownPicker
+          style={{ backgroundColor: "white" }}
+          dropDownContainerStyle={{
+            backgroundColor: "white",
+            zIndex: 1000,
+          }}
           open={open}
           value={productType}
           items={items}
@@ -133,7 +138,7 @@ const AddFood = () => {
             <Text className="text-red-500">*</Text>
           </Text>
           <TextInput
-            className="bg-white w-[4rem] p-1 border-[1px] rounded-md"
+            className="bg-white text-black w-[4rem] p-1 border-[1px] rounded-md"
             keyboardType="decimal-pad"
             value={calories}
             onChangeText={(text) => setCalories(handleTextChange(text))}
@@ -146,7 +151,7 @@ const AddFood = () => {
             <Text className="text-red-500">*</Text>
           </Text>
           <TextInput
-            className="bg-white w-[4rem] p-1 border-[1px] rounded-md"
+            className="bg-white text-black w-[4rem] p-1 border-[1px] rounded-md"
             keyboardType="decimal-pad"
             value={fat}
             onChangeText={(text) => setFat(handleTextChange(text))}
@@ -159,7 +164,7 @@ const AddFood = () => {
             <Text className="text-red-500">*</Text>
           </Text>
           <TextInput
-            className="bg-white w-[4rem] p-1 border-[1px] rounded-md"
+            className="bg-white text-black w-[4rem] p-1 border-[1px] rounded-md"
             keyboardType="decimal-pad"
             value={carbs}
             onChangeText={(text) => setCarbs(handleTextChange(text))}
@@ -172,7 +177,7 @@ const AddFood = () => {
             <Text className="text-red-500">*</Text>
           </Text>
           <TextInput
-            className="bg-white w-[4rem] p-1 border-[1px] rounded-md"
+            className="bg-white text-black w-[4rem] p-1 border-[1px] rounded-md"
             keyboardType="decimal-pad"
             value={protein}
             onChangeText={(text) => setProtein(handleTextChange(text))}
@@ -185,7 +190,7 @@ const AddFood = () => {
             <Text className="text-red-500">*</Text>
           </Text>
           <TextInput
-            className="bg-white w-[4rem] p-1 border-[1px] rounded-md"
+            className="bg-white text-black w-[4rem] p-1 border-[1px] rounded-md"
             keyboardType="decimal-pad"
             value={quantity}
             onChangeText={(text) => setQuantity(handleTextChange(text))}
