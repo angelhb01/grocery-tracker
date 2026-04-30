@@ -1,4 +1,6 @@
-import { Text, View } from "react-native";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Feather from "@expo/vector-icons/Feather";
+import { StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useAnimatedStyle,
@@ -24,7 +26,6 @@ export default function GroceryItem({
   onEdit: (id: number) => void;
 }) {
   const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
 
   const swipe = Gesture.Pan()
     .activeOffsetX([-10, 10]) // require horizontal movement
@@ -47,33 +48,46 @@ export default function GroceryItem({
   return (
     <View className="w-full">
       {/* Background */}
-      <View className="absolute right-0 top-0 bottom-0 h-full w-full">
+      <View className="absolute right-0 top-0 bottom-0 h-full w-full rounded-xl overflow-hidden">
         <Button
-          className="absolute right-0 top-0 bottom-0 w-[110px] h-1/2 bg-red-500 justify-center items-center rounded-xl"
+          className="absolute right-0 top-0 bottom-0 w-[110px] h-1/2 bg-red-500 justify-center items-center"
           onPress={() => onDelete(item.id)}
         >
-          <Text className="text-white font-bold">Delete</Text>
+          <AntDesign name="delete" size={24} color="white" />
         </Button>
         <Button
-          className="absolute right-0 top-auto bottom-0 w-[110px] h-1/2 bg-blue-400 justify-center items-center rounded-xl"
+          className="absolute right-0 top-auto bottom-0 w-[110px] h-1/2 bg-blue-400 justify-center items-center"
           onPress={() => onEdit(item.id)}
         >
-          <Text className="text-white font-bold">Edit</Text>
+          <Feather name="edit" size={24} color="white" />
         </Button>
       </View>
 
       {/* Foreground */}
       <GestureDetector gesture={swipe}>
-        <Animated.View
-          className="min-h-[10rem] p-5 bg-white rounded-xl border-2 border-black"
-          style={animatedSwipe}
-        >
-          <Text>Name: {item.product_name}</Text>
-          <Text>Description:</Text>
+        <Animated.View style={[animatedSwipe, styles.groceryContainer]}>
+          <Text>
+            <Text className="font-bold">Name: </Text>
+            {item.product_name}
+          </Text>
+          <Text className="font-bold">Description:</Text>
           <Text>{item.product_desc}</Text>
-          <Text>Quantity: {item.quantity}</Text>
+          <Text>
+            <Text className="font-bold">Quantity: </Text>
+            {item.quantity}
+          </Text>
         </Animated.View>
       </GestureDetector>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  groceryContainer: {
+    backgroundColor: "white",
+    borderWidth: 2,
+    borderColor: "black",
+    borderRadius: 10,
+    padding: 10,
+  },
+});

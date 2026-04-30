@@ -26,6 +26,7 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [groceries, setGroceries] = useState<Groceries[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [userID, setUserID] = useState("");
 
   async function loadGroceries(isRefresh = false) {
     try {
@@ -39,9 +40,11 @@ export default function Index() {
       if (userError) throw userError;
       if (!user) throw new Error("No user found");
 
+      setUserID(user.id);
+
       const { data, error } = await supabase
         .from("groceries")
-        .select("id, product_name, product_desc, quantity")
+        .select()
         .eq("uuid", user.id);
 
       if (error) throw error;
@@ -69,6 +72,10 @@ export default function Index() {
 
   async function handleEdit(id: number) {
     console.log("Editing item");
+    router.push({
+      pathname: "/editFood",
+      params: { userID: userID, groceryID: id },
+    });
   }
 
   // Initial load

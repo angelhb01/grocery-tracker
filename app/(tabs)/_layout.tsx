@@ -12,31 +12,49 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
-          tabBarIcon: () => <Foundation name="home" size={30} />,
+          title: "",
+          tabBarActiveTintColor: "green",
+          tabBarInactiveTintColor: "black",
+          tabBarIcon: ({ color }) => (
+            <Foundation name="home" size={30} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="camera"
         options={{
-          title: "Camera",
-          tabBarIcon: () => <AntDesign name="camera" size={30} />,
+          title: "",
+          tabBarActiveTintColor: "green",
+          tabBarInactiveTintColor: "black",
+          tabBarIcon: ({ color }) => (
+            <AntDesign name="camera" size={30} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="analytics"
         options={{
-          title: "Analytics",
-          tabBarIcon: () => (
-            <MaterialCommunityIcons name="google-analytics" size={25} />
+          title: "",
+          tabBarActiveTintColor: "green",
+          tabBarInactiveTintColor: "black",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons
+              name="google-analytics"
+              size={30}
+              color={color}
+            />
           ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
-          tabBarIcon: () => <Ionicons name="person" size={30} />,
+          title: "",
+          tabBarActiveTintColor: "green",
+          tabBarInactiveTintColor: "black",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="person" size={30} color={color} />
+          ),
         }}
       />
     </Tabs>
