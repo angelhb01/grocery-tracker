@@ -1,3 +1,4 @@
+import GroceryItem from "@/components/GroceryItem";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import { Entypo } from "@expo/vector-icons";
@@ -11,6 +12,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Groceries {
@@ -21,100 +23,110 @@ interface Groceries {
 }
 
 export default function Index() {
-  const [loading, setLoading] = useState(false);
-  const [groceries, setGroceries] = useState<Array<Groceries>>();
+  const [loading, setLoading] = useState(true);
+  const [groceries, setGroceries] = useState<Groceries[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Scroll down to refresh
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  }, []);
-
-  async function loadGroceries() {
+  async function loadGroceries(isRefresh = false) {
     try {
+      if (!isRefresh) setLoading(true);
+
       const {
         data: { user },
-        error,
+        error: userError,
       } = await supabase.auth.getUser();
 
-      if (user) {
-        const { data, error } = await supabase
-          .from("groceries")
-          .select("id, product_name, product_desc, quantity")
-          .eq("uuid", user.id);
+      if (userError) throw userError;
+      if (!user) throw new Error("No user found");
 
-        if (error) {
-          console.log(error);
-        } else {
-          setGroceries(data);
-          //console.log(data);
-        }
-      } else {
-        console.log(error);
-      }
+      const { data, error } = await supabase
+        .from("groceries")
+        .select("id, product_name, product_desc, quantity")
+        .eq("uuid", user.id);
+
+      if (error) throw error;
+
+      setGroceries(data || []);
     } catch (e) {
-      Alert.alert("" + e);
       console.log(e);
+      Alert.alert("Error loading groceries");
+    } finally {
+      if (!isRefresh) setLoading(false);
     }
   }
 
-  // Initital groceries list rendered
+  async function handleDelete(id: number) {
+    try {
+      const { error } = await supabase.from("groceries").delete().eq("id", id);
+      if (error) throw error;
+
+      setGroceries((prev) => prev.filter((item) => item.id !== id));
+    } catch (e) {
+      console.log(e);
+      Alert.alert("Unexpected Error Occurred");
+    }
+  }
+
+  async function handleEdit(id: number) {
+    console.log("Editing item");
+  }
+
+  // Initial load
   useEffect(() => {
-    setLoading(true);
     loadGroceries();
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
   }, []);
 
-  // Refresh groceries list
-  useEffect(() => {
-    loadGroceries();
-  }, [refreshing]);
+  // Refresh
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadGroceries(true);
+    setRefreshing(false);
+  }, []);
 
   return (
     <SafeAreaView className="flex-1">
-      {/* Header */}
-      <View className="p-5 border-b-2 h-[6rem]">
-        <Text className="text-3xl text-center">Grocery List</Text>
-      </View>
-
-      {/* Add your own food */}
-      <View className="">
-        <Button onPress={() => router.push({ pathname: "/addFood" })}>
-          <Entypo name="circle-with-plus" size={32} color="black" />
-        </Button>
-      </View>
-
-      {/* Grocery list */}
-      {loading ? (
-        <View>
-          <ActivityIndicator color={"black"} />
+      <GestureHandlerRootView>
+        {/* Header */}
+        <View className="p-5 border-b-2 h-[6rem]">
+          <Text className="text-3xl text-center">Grocery List</Text>
         </View>
-      ) : (
-        /* List of Foods */
-        <ScrollView
-          contentContainerClassName="flex-grow-1 gap-5 p-5"
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
-          {groceries?.map((item) => (
-            <View
-              className="min-h-[10rem] p-5 bg-white rounded-xl border-2 border-solid border-black"
-              key={item.id}
-            >
-              <Text>Name: {item.product_name}</Text>
-              <Text>Description:</Text>
-              <Text>{item.product_desc}</Text>
-              <Text>Quantity: {item.quantity}</Text>
-            </View>
-          ))}
-        </ScrollView>
-      )}
+
+        {/* Add food */}
+        <View>
+          <Button onPress={() => router.push({ pathname: "/addFood" })}>
+            <Entypo name="circle-with-plus" size={32} color="black" />
+          </Button>
+        </View>
+
+        {/* Content */}
+        {loading ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator color="black" />
+          </View>
+        ) : (
+          <ScrollView
+            contentContainerClassName="flex-grow gap-5 p-5"
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
+            {groceries.length === 0 ? (
+              <Text className="text-center text-gray-500">
+                No groceries yet
+              </Text>
+            ) : (
+              groceries.map((item) => (
+                <GroceryItem
+                  key={item.id}
+                  item={item}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                />
+              ))
+            )}
+          </ScrollView>
+        )}
+      </GestureHandlerRootView>
     </SafeAreaView>
   );
 }

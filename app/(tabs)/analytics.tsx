@@ -1,11 +1,10 @@
 import { supabase } from "@/lib/supabase";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   RefreshControl,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -20,68 +19,38 @@ interface FoodData {
   quantity: number;
 }
 
-interface PieData {
-  value: number;
-  color: string;
-}
-
 const AnalyticsScreen = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [foodData, setFoodData] = useState<FoodData[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(false);
 
-  const [pieData, setPieData] = useState<PieData[]>([]);
+  // Compute totals once
+  const totals = useMemo(() => {
+    const calories = foodData.reduce((t, c) => t + c.calories * c.quantity, 0);
+    const carbs = foodData.reduce((t, c) => t + c.carbs * c.quantity, 0);
+    const fat = foodData.reduce((t, c) => t + c.fat * c.quantity, 0);
+    const protein = foodData.reduce((t, c) => t + c.protein * c.quantity, 0);
 
-  const [dataTotal, setDataTotal] = useState(0);
+    const total = calories + carbs + fat + protein;
 
-  // Scroll down to refresh
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  }, []);
+    return { calories, carbs, fat, protein, total };
+  }, [foodData]);
 
-  // Update latest information about the food
-  function updateAnalytics(data: FoodData[]) {
-    // Add the total value of all the nutrients
-    setDataTotal(
-      data.reduce((total, curr) => {
-        return (
-          (total + curr.calories + curr.carbs + curr.fat + curr.protein) *
-          curr.quantity
-        );
-      }, 0),
-    );
+  // Pie data derived from totals
+  const pieData = useMemo(() => {
+    return [
+      { value: totals.calories, color: "#177ad5" },
+      { value: totals.fat, color: "#79D2DE" },
+      { value: totals.carbs, color: "#ED6665" },
+      { value: totals.protein, color: "yellow" },
+    ];
+  }, [totals]);
 
-    setPieData([
-      {
-        value: data.reduce((total, curr) => {
-          return (total + curr.calories) * curr.quantity;
-        }, 0),
-        color: "#177ad5",
-      },
-      {
-        value: data.reduce((total, curr) => {
-          return (total + curr.fat) * curr.quantity;
-        }, 0),
-        color: "#79D2DE",
-      },
-      {
-        value: data.reduce((total, curr) => {
-          return (total + curr.carbs) * curr.quantity;
-        }, 0),
-        color: "#ED6665",
-      },
-      {
-        value: data.reduce((total, curr) => {
-          return (total + curr.protein) * curr.quantity;
-        }, 0),
-        color: "yellow",
-      },
-    ]);
-  }
+  // Helper for percentages
+  const getPercent = (value: number) => {
+    if (totals.total === 0) return 0;
+    return (value / totals.total) * 100;
+  };
 
   async function getFoodData(id: string) {
     try {
@@ -89,53 +58,53 @@ const AnalyticsScreen = () => {
         .from("groceries")
         .select("calories, fat, carbs, protein, quantity")
         .eq("uuid", id);
+
       if (error) {
         console.log(error);
         Alert.alert("Unexpected Error Occurred");
       } else {
-        setFoodData(data);
-        updateAnalytics(data);
-        console.log(data);
+        setFoodData(data || []);
       }
     } catch (e) {
-      Alert.alert("Unexpected Error Occurred");
       console.log(e);
+      Alert.alert("Unexpected Error Occurred");
     }
   }
 
-  async function getUserData() {
+  async function getUserData(isRefresh = false) {
     try {
-      setLoading(true);
+      if (!isRefresh) setLoading(true);
+
       const {
         data: { user },
         error,
       } = await supabase.auth.getUser();
+
       if (user) {
-        //console.log("User:", user.id);
-        //console.log(userID);
-        getFoodData(user.id);
+        await getFoodData(user.id);
       } else {
-        Alert.alert("Unexpected Error Occurred");
         console.log(error);
+        Alert.alert("Unexpected Error Occurred");
       }
     } catch (e) {
-      Alert.alert("Unexpected Error Occurred");
       console.log(e);
+      Alert.alert("Unexpected Error Occurred");
     } finally {
-      setLoading(false);
+      if (!isRefresh) setLoading(false);
     }
   }
 
+  // Initial load
   useEffect(() => {
     getUserData();
-    setTimeout(() => {
-      setInitialLoad(true);
-    }, 1000);
   }, []);
 
-  useEffect(() => {
-    getUserData();
-  }, [refreshing]);
+  // Refresh
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await getUserData(true);
+    setRefreshing(false);
+  }, []);
 
   return (
     <SafeAreaView className="flex-1">
@@ -143,10 +112,10 @@ const AnalyticsScreen = () => {
       <View className="p-5 border-b-2 h-[6rem]">
         <Text className="text-3xl text-center">Analytics</Text>
       </View>
-      {/* Food Analytics */}
-      {loading && !initialLoad ? (
-        <View className="flex-col flex-1 justify-center items-center">
-          <ActivityIndicator color={"black"} />
+
+      {loading ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator color="black" />
         </View>
       ) : (
         <ScrollView
@@ -160,121 +129,60 @@ const AnalyticsScreen = () => {
             <PieChart donut radius={130} innerRadius={20} data={pieData} />
           </View>
 
-          {/* Food Info */}
-          <View className="flex-col m-2 min-h-[5rem] gap-3">
-            <View className="flex-col">
+          {/* Bars */}
+          <View className="flex-col m-2 gap-3">
+            {/* Calories */}
+            <View>
               <View className="flex-row justify-between">
                 <Text>Calories</Text>
-                <Text>
-                  {(
-                    (foodData.reduce((total, curr) => {
-                      return (total + curr.calories) * curr.quantity;
-                    }, 0) /
-                      dataTotal) *
-                    100
-                  ).toFixed(2)}
-                  %
-                </Text>
+                <Text>{getPercent(totals.calories).toFixed(2)}%</Text>
               </View>
               <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
                 <View
-                  className={`bg-blue-500 h-full`}
-                  style={{
-                    width: `${
-                      (foodData.reduce((total, curr) => {
-                        return (total + curr.calories) * curr.quantity;
-                      }, 0) /
-                        dataTotal) *
-                      100
-                    }%`,
-                  }}
+                  className="bg-blue-500 h-full"
+                  style={{ width: `${getPercent(totals.calories)}%` }}
                 />
               </View>
             </View>
-            <View className="flex-col">
+
+            {/* Carbs */}
+            <View>
               <View className="flex-row justify-between">
                 <Text>Carbs</Text>
-                <Text>
-                  {(
-                    (foodData.reduce((total, curr) => {
-                      return (total + curr.carbs) * curr.quantity;
-                    }, 0) /
-                      dataTotal) *
-                    100
-                  ).toFixed(2)}
-                  %
-                </Text>
+                <Text>{getPercent(totals.carbs).toFixed(2)}%</Text>
               </View>
               <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
                 <View
-                  className={`bg-red-500 h-full`}
-                  style={{
-                    width: `${
-                      (foodData.reduce((total, curr) => {
-                        return (total + curr.carbs) * curr.quantity;
-                      }, 0) /
-                        dataTotal) *
-                      100
-                    }%`,
-                  }}
+                  className="bg-red-500 h-full"
+                  style={{ width: `${getPercent(totals.carbs)}%` }}
                 />
               </View>
             </View>
-            <View className="flex-col">
+
+            {/* Fat */}
+            <View>
               <View className="flex-row justify-between">
                 <Text>Fat</Text>
-                <Text>
-                  {(
-                    (foodData.reduce((total, curr) => {
-                      return (total + curr.fat) * curr.quantity;
-                    }, 0) /
-                      dataTotal) *
-                    100
-                  ).toFixed(2)}
-                  %
-                </Text>
+                <Text>{getPercent(totals.fat).toFixed(2)}%</Text>
               </View>
               <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
                 <View
-                  className={`bg-cyan-500 h-full`}
-                  style={{
-                    width: `${
-                      (foodData.reduce((total, curr) => {
-                        return (total + curr.fat) * curr.quantity;
-                      }, 0) /
-                        dataTotal) *
-                      100
-                    }%`,
-                  }}
+                  className="bg-cyan-500 h-full"
+                  style={{ width: `${getPercent(totals.fat)}%` }}
                 />
               </View>
             </View>
-            <View className="flex-col">
+
+            {/* Protein */}
+            <View>
               <View className="flex-row justify-between">
                 <Text>Protein</Text>
-                <Text>
-                  {(
-                    (foodData.reduce((total, curr) => {
-                      return (total + curr.protein) * curr.quantity;
-                    }, 0) /
-                      dataTotal) *
-                    100
-                  ).toFixed(2)}
-                  %
-                </Text>
+                <Text>{getPercent(totals.protein).toFixed(2)}%</Text>
               </View>
               <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
                 <View
-                  className={`bg-yellow-500 h-full`}
-                  style={{
-                    width: `${
-                      (foodData.reduce((total, curr) => {
-                        return (total + curr.protein) * curr.quantity;
-                      }, 0) /
-                        dataTotal) *
-                      100
-                    }%`,
-                  }}
+                  className="bg-yellow-500 h-full"
+                  style={{ width: `${getPercent(totals.protein)}%` }}
                 />
               </View>
             </View>
@@ -286,5 +194,3 @@ const AnalyticsScreen = () => {
 };
 
 export default AnalyticsScreen;
-
-const styles = StyleSheet.create({});

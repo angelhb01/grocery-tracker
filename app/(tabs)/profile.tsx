@@ -2,7 +2,14 @@ import DeleteBtn from "@/components/auth/DeleteBtn";
 import SignOutBtn from "@/components/auth/SignoutBtn";
 import { supabase } from "@/lib/supabase";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const ProfileScreen = () => {
@@ -12,18 +19,11 @@ const ProfileScreen = () => {
   const [lastName, setLastName] = useState("");
   const [refreshing, setRefreshing] = useState(false);
 
-  // Scroll down to refresh
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  }, []);
-
   // Get user's username
-  async function getUsername() {
-    setLoading(true);
+  async function getUsername(isRefresh = false) {
     try {
+      if (!isRefresh) setLoading(true);
+
       const {
         data: { user },
         error,
@@ -48,14 +48,20 @@ const ProfileScreen = () => {
     } catch (e) {
       console.log("Unexpected error occurred: " + e);
     } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
+      if (!isRefresh) setLoading(false);
     }
   }
 
+  // Initial load
   useEffect(() => {
     getUsername();
+  }, []);
+
+  // Refresh
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await getUsername(true);
+    setRefreshing(false);
   }, []);
 
   return (
