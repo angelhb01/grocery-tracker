@@ -7,8 +7,9 @@ import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const AddFood = () => {
+const AddFoodScreen = () => {
   const [loading, setLoading] = useState(false);
+
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [calories, setCalories] = useState("");
@@ -16,7 +17,6 @@ const AddFood = () => {
   const [carbs, setCarbs] = useState("");
   const [protein, setProtein] = useState("");
   const [quantity, setQuantity] = useState("1");
-  const [user, setUser] = useState();
 
   // Dropdown values
   const [open, setOpen] = useState(false);
@@ -40,6 +40,7 @@ const AddFood = () => {
       Alert.alert("Please fill the required fields");
       return;
     }
+
     setLoading(true);
     try {
       const {
@@ -215,6 +216,6 @@ const AddFood = () => {
   );
 };
 
-export default AddFood;
+export default AddFoodScreen;
 
 const styles = StyleSheet.create({});
