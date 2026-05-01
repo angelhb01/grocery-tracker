@@ -67,13 +67,15 @@ export default function GroceryItem({
       <GestureDetector gesture={swipe}>
         <Animated.View style={[animatedSwipe, styles.groceryContainer]}>
           <Text>
-            <Text className="font-bold">Name: </Text>
+            <Text className="color-[#929292]">Name: </Text>
             {item.product_name}
           </Text>
-          <Text className="font-bold">Description:</Text>
-          <Text>{item.product_desc}</Text>
           <Text>
-            <Text className="font-bold">Quantity: </Text>
+            <Text className="color-[#929292]">Description:{"\n"}</Text>
+            {item.product_desc}
+          </Text>
+          <Text>
+            <Text className="color-[#929292]">Quantity: </Text>
             {item.quantity}
           </Text>
         </Animated.View>
@@ -84,7 +86,11 @@ export default function GroceryItem({
 
 const styles = StyleSheet.create({
   groceryContainer: {
-    backgroundColor: "white",
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    backgroundColor: "#FFFFFF",
+    minHeight: 150,
     borderWidth: 2,
     borderColor: "black",
     borderRadius: 10,
