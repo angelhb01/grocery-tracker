@@ -8,13 +8,22 @@ import { Tabs } from "expo-router";
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: "#cefad0",
+          borderTopWidth: 1,
+          borderColor: "#008631",
+        },
+        sceneStyle: { backgroundColor: "#F6FFF7" },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: "",
           tabBarActiveTintColor: "green",
-          tabBarInactiveTintColor: "black",
           tabBarIcon: ({ color }) => (
             <Foundation name="home" size={30} color={color} />
           ),
@@ -25,7 +34,6 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarActiveTintColor: "green",
-          tabBarInactiveTintColor: "black",
           tabBarIcon: ({ color }) => (
             <AntDesign name="camera" size={30} color={color} />
           ),
@@ -36,7 +44,6 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarActiveTintColor: "green",
-          tabBarInactiveTintColor: "black",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="google-analytics"
@@ -51,7 +58,6 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarActiveTintColor: "green",
-          tabBarInactiveTintColor: "black",
           tabBarIcon: ({ color }) => (
             <Ionicons name="person" size={30} color={color} />
           ),
