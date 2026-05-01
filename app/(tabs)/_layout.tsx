@@ -12,9 +12,8 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#cefad0",
-          borderTopWidth: 1,
-          borderColor: "#008631",
+          backgroundColor: "white",
+          height: 100,
         },
         sceneStyle: { backgroundColor: "#F6FFF7" },
       }}
@@ -23,7 +22,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "",
-          tabBarActiveTintColor: "green",
+          tabBarActiveTintColor: "#008000",
           tabBarIcon: ({ color }) => (
             <Foundation name="home" size={30} color={color} />
           ),
@@ -33,7 +32,7 @@ export default function TabLayout() {
         name="camera"
         options={{
           title: "",
-          tabBarActiveTintColor: "green",
+          tabBarActiveTintColor: "#008000",
           tabBarIcon: ({ color }) => (
             <AntDesign name="camera" size={30} color={color} />
           ),
@@ -43,7 +42,7 @@ export default function TabLayout() {
         name="analytics"
         options={{
           title: "",
-          tabBarActiveTintColor: "green",
+          tabBarActiveTintColor: "#008000",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons
               name="google-analytics"
@@ -57,7 +56,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "",
-          tabBarActiveTintColor: "green",
+          tabBarActiveTintColor: "#008000",
           tabBarIcon: ({ color }) => (
             <Ionicons name="person" size={30} color={color} />
           ),
