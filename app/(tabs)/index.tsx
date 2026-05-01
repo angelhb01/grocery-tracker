@@ -94,14 +94,16 @@ export default function Index() {
     <SafeAreaView className="flex-1">
       <GestureHandlerRootView>
         {/* Header */}
-        <View className="p-5 border-b-2 h-[6rem]">
-          <Text className="text-3xl text-center">Grocery List</Text>
+        <View className="p-5 border-b-2 h-[6rem] border-[#008000]">
+          <Text className="text-3xl text-center text-[#008000]">
+            Grocery List
+          </Text>
         </View>
 
         {/* Add food */}
         <View>
           <Button onPress={() => router.push({ pathname: "/addFood" })}>
-            <Entypo name="circle-with-plus" size={32} color="black" />
+            <Entypo name="circle-with-plus" size={32} color="#008000" />
           </Button>
         </View>
 
