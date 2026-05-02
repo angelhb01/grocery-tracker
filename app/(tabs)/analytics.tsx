@@ -1,6 +1,10 @@
 import Nutrition from "@/components/Nutrition";
 import { supabase } from "@/lib/supabase";
+import { FontAwesome6 } from "@expo/vector-icons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -201,6 +205,13 @@ const AnalyticsScreen = () => {
             {/* Calories */}
             <Nutrition
               name={"Calories"}
+              icon={
+                <AntDesign
+                  name="fire"
+                  size={25}
+                  color={nutritionColors.calories}
+                />
+              }
               getPercent={getPercent}
               total={totals.total}
               nutritionValue={totals.calories}
@@ -210,6 +221,13 @@ const AnalyticsScreen = () => {
             {/* Carbs */}
             <Nutrition
               name={"Carbs"}
+              icon={
+                <FontAwesome6
+                  name="wheat-awn"
+                  size={25}
+                  color={nutritionColors.carbs}
+                />
+              }
               getPercent={getPercent}
               total={totals.total}
               nutritionValue={totals.carbs}
@@ -219,6 +237,13 @@ const AnalyticsScreen = () => {
             {/* Fat */}
             <Nutrition
               name={"Fat"}
+              icon={
+                <Ionicons
+                  name="water-sharp"
+                  size={30}
+                  color="#4CAF50"
+                />
+              }
               getPercent={getPercent}
               total={totals.total}
               nutritionValue={totals.fat}
@@ -228,6 +253,13 @@ const AnalyticsScreen = () => {
             {/* Protein */}
             <Nutrition
               name={"Protein"}
+              icon={
+                <MaterialCommunityIcons
+                  name="arm-flex"
+                  size={30}
+                  color="#4CAF50"
+                />
+              }
               getPercent={getPercent}
               total={totals.total}
               nutritionValue={totals.protein}

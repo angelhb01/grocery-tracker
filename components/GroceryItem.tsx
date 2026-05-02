@@ -68,7 +68,7 @@ export default function GroceryItem({
       <GestureDetector gesture={swipe}>
         <Animated.View style={[animatedSwipe, styles.groceryContainer]}>
           <View className="border-b border-slate-300 flex-row justify-start gap-5 items-center">
-            <View className="bg-green-200 rounded-full p-2">
+            <View className="bg-green-200 rounded-full p-2 h-[3rem] w-[3rem] flex justify-center items-center">
               <AntDesign name="tag" size={24} color="#008000" />
             </View>
             <View>
@@ -77,7 +77,7 @@ export default function GroceryItem({
             </View>
           </View>
           <View className="border-b border-slate-300 flex-row justify-start gap-5 items-center">
-            <View className="bg-green-200 rounded-full p-2">
+            <View className="bg-green-200 rounded-full p-2 h-[3rem] w-[3rem] flex justify-center items-center">
               <FontAwesome5 name="list-alt" size={24} color="#008000" />
             </View>
             <View>
@@ -86,7 +86,7 @@ export default function GroceryItem({
             </View>
           </View>
           <View className="flex-row justify-start gap-5 items-center">
-            <View className="bg-green-200 rounded-full p-2">
+            <View className="bg-green-200 rounded-full p-2 h-[3rem] w-[3rem] flex justify-center items-center">
               <Feather name="package" size={24} color="#008000" />
             </View>
             <View>
