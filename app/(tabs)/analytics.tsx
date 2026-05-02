@@ -1,10 +1,13 @@
+import Nutrition from "@/components/Nutrition";
 import { supabase } from "@/lib/supabase";
+import Entypo from "@expo/vector-icons/Entypo";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   RefreshControl,
   ScrollView,
+  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -36,13 +39,20 @@ const AnalyticsScreen = () => {
     return { calories, carbs, fat, protein, total };
   }, [foodData]);
 
+  const nutritionColors = {
+    calories: "#4CAF50",
+    carbs: "#F5A623",
+    fat: "#81C784",
+    protein: "#C8E6C9",
+  };
+
   // Pie data derived from totals
   const pieData = useMemo(() => {
     return [
-      { value: totals.calories, color: "#177ad5" },
-      { value: totals.fat, color: "#79D2DE" },
-      { value: totals.carbs, color: "#ED6665" },
-      { value: totals.protein, color: "yellow" },
+      { value: totals.calories, color: nutritionColors.calories },
+      { value: totals.fat, color: nutritionColors.fat },
+      { value: totals.carbs, color: nutritionColors.carbs },
+      { value: totals.protein, color: nutritionColors.protein },
     ];
   }, [totals]);
 
@@ -119,73 +129,110 @@ const AnalyticsScreen = () => {
         </View>
       ) : (
         <ScrollView
-          contentContainerClassName="flex-1"
+          contentContainerStyle={{ paddingBottom: 20 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
           {/* Pie Chart */}
-          <View className="flex-row justify-center items-center p-5">
-            <PieChart donut radius={130} innerRadius={20} data={pieData} />
+          <View style={styles.pieChartContainer}>
+            <PieChart
+              donut
+              radius={130}
+              innerRadius={70}
+              data={pieData}
+              centerLabelComponent={() => {
+                return (
+                  <>
+                    <View className="flex-col items-center gap-1">
+                      <View>
+                        <Entypo name="leaf" size={24} color="green" />
+                      </View>
+                      <View>
+                        <Text style={styles.smallText}>Total Calories</Text>
+                      </View>
+                      <View>
+                        <Text className="text-[#008000] text-[1.5rem]">
+                          {totals.total.toFixed(2)}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text style={styles.smallText}>kcal</Text>
+                      </View>
+                    </View>
+                  </>
+                );
+              }}
+            />
+            <View className="flex-row gap-5">
+              <View className="flex-row items-center gap-1">
+                <View
+                  className="h-3 w-3 rounded-full"
+                  style={{ backgroundColor: `${nutritionColors.calories}` }}
+                />
+                <Text style={styles.smallText}>Calories</Text>
+              </View>
+              <View className="flex-row items-center gap-1">
+                <View
+                  className="h-3 w-3 rounded-full"
+                  style={{ backgroundColor: `${nutritionColors.carbs}` }}
+                />
+                <Text style={styles.smallText}>Carbs</Text>
+              </View>
+              <View className="flex-row items-center gap-1">
+                <View
+                  className="h-3 w-3 rounded-full"
+                  style={{ backgroundColor: `${nutritionColors.fat}` }}
+                />
+                <Text style={styles.smallText}>Fat</Text>
+              </View>
+              <View className="flex-row items-center gap-1">
+                <View
+                  className="h-3 w-3 rounded-full"
+                  style={{ backgroundColor: `${nutritionColors.protein}` }}
+                />
+                <Text style={styles.smallText}>Protein</Text>
+              </View>
+            </View>
           </View>
 
           {/* Bars */}
-          <View className="flex-col m-2 gap-3">
+          <View className="flex-col mx-5 gap-3">
             {/* Calories */}
-            <View>
-              <View className="flex-row justify-between">
-                <Text>Calories</Text>
-                <Text>{getPercent(totals.calories).toFixed(2)}%</Text>
-              </View>
-              <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
-                <View
-                  className="bg-blue-500 h-full"
-                  style={{ width: `${getPercent(totals.calories)}%` }}
-                />
-              </View>
-            </View>
+            <Nutrition
+              name={"Calories"}
+              getPercent={getPercent}
+              total={totals.total}
+              nutritionValue={totals.calories}
+              nutritionColor={nutritionColors.calories}
+            />
 
             {/* Carbs */}
-            <View>
-              <View className="flex-row justify-between">
-                <Text>Carbs</Text>
-                <Text>{getPercent(totals.carbs).toFixed(2)}%</Text>
-              </View>
-              <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
-                <View
-                  className="bg-red-500 h-full"
-                  style={{ width: `${getPercent(totals.carbs)}%` }}
-                />
-              </View>
-            </View>
+            <Nutrition
+              name={"Carbs"}
+              getPercent={getPercent}
+              total={totals.total}
+              nutritionValue={totals.carbs}
+              nutritionColor={nutritionColors.carbs}
+            />
 
             {/* Fat */}
-            <View>
-              <View className="flex-row justify-between">
-                <Text>Fat</Text>
-                <Text>{getPercent(totals.fat).toFixed(2)}%</Text>
-              </View>
-              <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
-                <View
-                  className="bg-cyan-500 h-full"
-                  style={{ width: `${getPercent(totals.fat)}%` }}
-                />
-              </View>
-            </View>
+            <Nutrition
+              name={"Fat"}
+              getPercent={getPercent}
+              total={totals.total}
+              nutritionValue={totals.fat}
+              nutritionColor={nutritionColors.fat}
+            />
 
             {/* Protein */}
-            <View>
-              <View className="flex-row justify-between">
-                <Text>Protein</Text>
-                <Text>{getPercent(totals.protein).toFixed(2)}%</Text>
-              </View>
-              <View className="h-8 w-full rounded-xl overflow-hidden bg-gray-200">
-                <View
-                  className="bg-yellow-500 h-full"
-                  style={{ width: `${getPercent(totals.protein)}%` }}
-                />
-              </View>
-            </View>
+            <Nutrition
+              name={"Protein"}
+              getPercent={getPercent}
+              total={totals.total}
+              nutritionValue={totals.protein}
+              nutritionColor={nutritionColors.protein}
+            />
           </View>
         </ScrollView>
       )}
@@ -194,3 +241,26 @@ const AnalyticsScreen = () => {
 };
 
 export default AnalyticsScreen;
+
+const styles = StyleSheet.create({
+  smallText: {
+    fontSize: 11,
+    color: "#696969",
+  },
+  pieChartContainer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 20,
+    padding: 20,
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+});
