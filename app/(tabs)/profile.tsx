@@ -1,6 +1,7 @@
 import DeleteBtn from "@/components/auth/DeleteBtn";
 import SignOutBtn from "@/components/auth/SignoutBtn";
 import { supabase } from "@/lib/supabase";
+import { Entypo } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -83,21 +84,36 @@ const ProfileScreen = () => {
           }
         >
           {/* Profile */}
-          <View className="flex flex-col px-20 p-10 justify-center items-center h-[20rem] gap-1 border-b-slate-50">
+          <View
+            className="bg-white m-5 rounded-xl flex flex-col px-20 p-10 justify-center items-center h-[19rem] gap-1 border-b-slate-50"
+            style={styles.profileContainer}
+          >
             {/* Profile picture */}
-            <View className="bg-red-200 rounded-full h-28 w-28 flex justify-center items-center shadow-md mb-5">
-              <Text className="text-center text-3xl">
-                {String(username[0]).toUpperCase()}
-              </Text>
+            <View className="bg-gray-100 rounded-full h-28 w-28 flex justify-center items-center border-solid border-slate-200 border-2 mb-5">
+              <View className="bg-green-100 rounded-full h-24 w-24 flex justify-center items-center border-solid">
+                <Text className="text-center text-[2.5rem] font-semibold text-[#008000]">
+                  {String(username[0]).toUpperCase()}
+                </Text>
+              </View>
             </View>
             {/* User info */}
-            <Text>
+            <Text className="text-xl font-semibold">
               {firstName} {lastName}
             </Text>
             <Text className="text-slate-500">{String(username)}</Text>
+            <View className="flex-row bg-green-100 h-8 rounded-xl items-center justify-start gap-1 p-2 mt-3">
+              <View>
+                <Entypo name="leaf" size={15} color="green" />
+              </View>
+              <View>
+                <Text className="text-green-800 text-xs">
+                  Healthy habits, better you.
+                </Text>
+              </View>
+            </View>
           </View>
           {/* Profile buttons */}
-          <View>
+          <View className="flex-col gap-1">
             <SignOutBtn />
             <DeleteBtn />
           </View>
@@ -109,4 +125,12 @@ const ProfileScreen = () => {
 
 export default ProfileScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  profileContainer: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+});
