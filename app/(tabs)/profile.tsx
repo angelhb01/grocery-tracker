@@ -2,6 +2,7 @@ import DeleteBtn from "@/components/auth/DeleteBtn";
 import SignOutBtn from "@/components/auth/SignoutBtn";
 import { supabase } from "@/lib/supabase";
 import { Entypo } from "@expo/vector-icons";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -101,7 +102,7 @@ const ProfileScreen = () => {
               {firstName} {lastName}
             </Text>
             <Text className="text-slate-500">{String(username)}</Text>
-            <View className="flex-row bg-green-100 h-8 rounded-xl items-center justify-start gap-1 p-2 mt-3">
+            <View className="flex-row bg-green-100 rounded-xl items-center justify-start gap-1 p-1 mt-3">
               <View>
                 <Entypo name="leaf" size={15} color="green" />
               </View>
@@ -113,9 +114,32 @@ const ProfileScreen = () => {
             </View>
           </View>
           {/* Profile buttons */}
-          <View className="flex-col gap-1">
+          <View className="flex-col gap-5">
             <SignOutBtn />
             <DeleteBtn />
+            <View className="bg-green-100 min-h-[6rem] mx-5 rounded-xl py-5 flex-row items-center justify-between gap-10 px-5 mt-3">
+              <View className="bg-green-200 w-[4rem] h-[4rem] flex justify-center items-center rounded-full">
+                <FontAwesome6 name="shield-halved" size={24} color="#008000" />
+              </View>
+              <View className="flex-col flex-1">
+                <View className="">
+                  <Text className="text-xs text-[#008000]">
+                    Your data is safe with us
+                  </Text>
+                </View>
+                <View className="text-xs">
+                  <Text className="text-xs text-slate-500">
+                    We use industry-standard security to keep your data
+                    protected.
+                  </Text>
+                </View>
+              </View>
+              <View className="ml-auto">
+                <View>
+                  <FontAwesome6 name="lock" size={24} color="#008000" />
+                </View>
+              </View>
+            </View>
           </View>
         </ScrollView>
       )}

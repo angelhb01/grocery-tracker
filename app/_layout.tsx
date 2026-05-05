@@ -24,10 +24,6 @@ export default function RootLayout() {
         <Stack.Screen
           name="(screens)"
           options={{
-            headerBackButtonDisplayMode: "minimal",
-            presentation: "modal",
-            sheetAllowedDetents: [0.7],
-            sheetGrabberVisible: true,
             headerShown: false,
           }}
         />
