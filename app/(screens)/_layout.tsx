@@ -5,7 +5,12 @@ import { StyleSheet } from "react-native";
 const ScreensLayout = () => {
   return (
     <GluestackUIProvider mode="system">
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: "white" },
+        }}
+      >
         <Stack.Screen name="addFood" />
         <Stack.Screen name="editFood" />
       </Stack>

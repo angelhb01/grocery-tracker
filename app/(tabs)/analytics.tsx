@@ -237,13 +237,7 @@ const AnalyticsScreen = () => {
             {/* Fat */}
             <Nutrition
               name={"Fat"}
-              icon={
-                <Ionicons
-                  name="water-sharp"
-                  size={30}
-                  color="#4CAF50"
-                />
-              }
+              icon={<Ionicons name="water-sharp" size={30} color="#4CAF50" />}
               getPercent={getPercent}
               total={totals.total}
               nutritionValue={totals.fat}
