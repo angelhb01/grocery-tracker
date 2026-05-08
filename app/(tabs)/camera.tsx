@@ -1,12 +1,20 @@
-import { Button, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera'
-import { useState, useRef } from 'react'
-import { useIsFocused } from '@react-navigation/native'
+import { useIsFocused } from "@react-navigation/native";
+import { CameraView, useCameraPermissions } from "expo-camera";
+import { router } from "expo-router";
+import { useRef, useState } from "react";
+import {
+  Alert,
+  Button,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const CameraScreen = () => {
   const isFocused = useIsFocused();
   const [permission, requestPermission] = useCameraPermissions();
+  const [loading, setLoading] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
 
   if (!permission) {
@@ -18,76 +26,82 @@ const CameraScreen = () => {
     // Camera permissions are not granted yet.
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <Text style={styles.message}>
+          We need your permission to show the camera
+        </Text>
         <Button onPress={requestPermission} title="grant permission" />
       </View>
     );
   }
 
-  // Breakpoint: Take pictures and show an image of the result to the screen.
+  // Set photo uri that was taken
   async function takePicture() {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
-      console.log(photo.uri)
-
-      return (
-        <View>
-          <Image 
-            source={{ uri: photo.uri}}
-            style={{ width: 200, height: 200 }}
-          />
-        </View>
-      )
+      try {
+        setLoading(true);
+        const photo = await cameraRef.current.takePictureAsync();
+        router.push({ pathname: "/foodInfo", params: { photoURI: photo.uri } });
+      } catch (e) {
+        Alert.alert("Unexpected Error Occurred");
+        console.log("Error at takePicture():", e);
+      } finally {
+        setLoading(false);
+      }
     }
   }
 
   return (
     <>
-    {isFocused ? (
-      <View style={styles.container}>
-        <CameraView style={styles.camera} facing='back' ref={cameraRef} />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={takePicture}>
-            <Text style={styles.text}>Take Picture</Text>
-          </TouchableOpacity>
+      {isFocused ? (
+        <View style={styles.container}>
+          <CameraView style={styles.camera} facing="back" ref={cameraRef} />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              className={`${loading ? "opacity-[0.5]" : "opacity-[1]"}`}
+              style={styles.button}
+              onPress={takePicture}
+              disabled={loading ? true : false}
+            >
+              <Text style={styles.text}>Take Picture</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    ) : (
-      <View />
-    )}
+      ) : (
+        <View />
+      )}
     </>
   );
-}
+};
 
-export default CameraScreen
+export default CameraScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   message: {
-    textAlign: 'center',
+    textAlign: "center",
     paddingBottom: 10,
   },
   camera: {
     flex: 1,
   },
   buttonContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 64,
-    flexDirection: 'row',
-    backgroundColor: 'transparent',
-    width: '100%',
+    flexDirection: "row",
+    backgroundColor: "transparent",
+    width: "100%",
     paddingHorizontal: 64,
   },
   button: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   text: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
   },
 });
