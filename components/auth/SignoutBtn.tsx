@@ -17,7 +17,6 @@ const Signout = () => {
         Alert.alert(error.message);
         return;
       }
-      router.replace("/(authentication)/login");
     } finally {
       setLoading(false);
     }
