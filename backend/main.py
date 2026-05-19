@@ -1,3 +1,4 @@
+"""
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, UploadFile
 from transformers import pipeline
@@ -40,3 +41,4 @@ async def predict(file: UploadFile = File(...)):
         "filename": file.filename,
         "predictions": res
     }
+""""

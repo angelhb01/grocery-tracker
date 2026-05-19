@@ -35,11 +35,10 @@ const FoodInfoScreen = () => {
   console.log(data);
   */
 
-  async function addToGroceries() {}
+  async function addToGroceries() { }
 
   return (
     <SafeAreaView className="flex-1">
-      {/* Header */}
       <View className="p-5 border-b-2 h-[6rem] border-[#008000]">
         <Text className="text-3xl text-center text-[#008000]">Food Info</Text>
       </View>

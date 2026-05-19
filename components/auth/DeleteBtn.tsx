@@ -3,14 +3,55 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
 import { Button, ButtonText } from "../ui/button";
+import { supabase } from '../../lib/supabase'
+import { useRouter } from "expo-router";
 
 export default function DeleteBtn() {
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   async function handleConfirmDelete() {
     setLoading(true);
 
-    setLoading(false);
+    try {
+      const { data } = await supabase.auth.getUser();
+      const userId = data.user?.id;
+      const { error } = await supabase.functions.invoke('delete-user', {
+        body: { userId: userId }
+      })
+      console.log("UserId", userId);
+
+      if (error) {
+        if (error) {
+          let errorMessage = error.message;
+          let statusCode = "Unknown";
+
+          try {
+            if (error.context) {
+              const errorBody = await error.context.json();
+              errorMessage = errorBody.error || error.message;
+              statusCode = error.context.status.toString();
+            }
+          } catch (parseError) {
+            console.log("Failed to parse error response:", parseError);
+          }
+
+          console.log("Status Code:", statusCode);
+          console.log("Error Message:", errorMessage);
+
+          Alert.alert(`Error ${statusCode}`, errorMessage);
+        }
+      } else {
+        await supabase.auth.signOut();
+        router.replace("/(authentication)/login");
+        Alert.alert("Successfully deleted your account");
+      }
+    } catch (e) {
+      Alert.alert("Unexpected Error Occurred");
+      console.log("Error in handleConfirmDelete():", e);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function deleteUser() {
