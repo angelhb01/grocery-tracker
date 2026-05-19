@@ -11,7 +11,9 @@ const ScreensLayout = () => {
     >
       <Stack.Screen name="addFood" />
       <Stack.Screen name="editFood" />
+      {/*
       <Stack.Screen name="foodInfo" />
+      */}
     </Stack>
   );
 };
