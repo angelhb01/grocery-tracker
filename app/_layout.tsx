@@ -1,34 +1,52 @@
 import "@/global.css";
 import { supabase } from "@/lib/supabase";
-import { Session } from '@supabase/supabase-js'
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 
 export default function RootLayout() {
+  const [username, setUsername] = useState<string | null>(null);
   const [session, setSession] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  async function loadProfile(userId: string) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("username")
+      .eq("id", userId)
+      .single();
+
+    if (error) {
+      console.log(error);
+      setUsername(null);
+      return;
+    }
+
+    setUsername(data?.username ?? null);
+  }
 
   useEffect(() => {
-    // Grabs current session and sets the state of whether its true or false
-    const loadSession = async () => {
-      setLoading(true);
+    const initalize = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         setSession(!!session);
+        if (session?.user) {
+          await loadProfile(session.user.id);
+        }
       } catch (e) {
-        Alert.alert("Unexpected Error Occurred");
         console.log("Error in loadSession():", e);
       } finally {
         setLoading(false);
       }
-    }
-    loadSession();
+    };
+
+    initalize();
 
     // Keeps track if the session changes (if user logs out)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(!!session);
-      setLoading(false);
     })
     return () => {
       subscription.unsubscribe();
@@ -38,25 +56,42 @@ export default function RootLayout() {
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size={"large"} />
+        <ActivityIndicator size="large" />
       </View>
-    )
+    );
   }
 
   const hasSession = !!session;
+  const hasUsername = !!username;
 
   return (
     <Stack>
+      { /* Not authenticated */}
       <Stack.Protected guard={!hasSession}>
-        <Stack.Screen name="(authentication)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="(authentication)"
+          options={{ headerShown: false }}
+        />
       </Stack.Protected>
-      <Stack.Protected guard={hasSession}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+      { /* authenticated but no profile */}
+      <Stack.Protected guard={hasSession && !hasUsername}>
+        <Stack.Screen
+          name="(setup)"
+          options={{ headerShown: false }}
+        />
+      </Stack.Protected>
+
+      { /* Both authenticated and has a profile */}
+      <Stack.Protected guard={hasSession && hasUsername}>
+        <Stack.Screen
+          name="(tabs)"
+          options={{ headerShown: false }}
+        />
+
         <Stack.Screen
           name="(screens)"
-          options={{
-            headerShown: false,
-          }}
+          options={{ headerShown: false }}
         />
       </Stack.Protected>
     </Stack>

@@ -1,7 +1,6 @@
 import { Stack } from "expo-router";
-import { StyleSheet } from "react-native";
 
-const ScreensLayout = () => {
+export default function SetupLayout() {
   return (
     <Stack
       screenOptions={{
@@ -9,16 +8,7 @@ const ScreensLayout = () => {
         contentStyle: { backgroundColor: "white" },
       }}
     >
-      <Stack.Screen name="addFood" />
-      <Stack.Screen name="editFood" />
       <Stack.Screen name='profileEdit' options={{ headerBackVisible: false, gestureEnabled: false }} />
-      {/*
-      <Stack.Screen name="foodInfo" />
-      */}
     </Stack>
   );
-};
-
-export default ScreensLayout;
-
-const styles = StyleSheet.create({});
+}

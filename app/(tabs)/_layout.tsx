@@ -13,7 +13,6 @@ export default function TabLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: "white",
-          height: 100,
         },
         sceneStyle: { backgroundColor: "#F6FFF7" },
       }}

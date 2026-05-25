@@ -41,32 +41,39 @@ export default function ProfileEdit() {
   }
 
   async function addUserDetails() {
+    if (
+      firstName.trim() === "" ||
+      lastName.trim() === "" ||
+      username.trim() === ""
+    ) {
+      Alert.alert("Invalid Credentials");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const user_id = await getUserId();
-      const { data, error } = await supabase
+
+      if (!user_id) {
+        Alert.alert("No user found");
+        return;
+      }
+
+      const { error } = await supabase
         .from("profiles")
         .update({
           first_name: firstName,
           last_name: lastName,
-          username: username,
+          username,
         })
-        .eq("id", user_id)
-        .select();
+        .eq("id", user_id);
 
-      if (error) {
-        console.log(error);
-      } else if (
-        firstName.trim() === "" ||
-        lastName.trim() === "" ||
-        username.trim() === ""
-      ) {
-        // Issue with else if() statement: prevent the user from inserting invalid credenetials('', ' ', etc.)
-        Alert.alert("Invalid Credentials");
-      } else {
-        router.replace("/(tabs)");
-      }
+      if (error) throw error;
+      //router.replace("/(tabs)");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Failed to update profile");
     } finally {
       setLoading(false);
     }
