@@ -11,11 +11,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Feather from '@expo/vector-icons/Feather';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [securePassword, setSecurePassword] = useState(true);
 
   async function onboarding(user_id: any) {
     try {
@@ -70,30 +73,51 @@ export default function Login() {
     >
       <View
         style={styles.container}
-        className="m-5 border-white shadow-sm rounded-md bg-white"
+        className="m-6 border-white shadow-sm rounded-md bg-white"
       >
-        <Text className="text-5xl text-center">Sign In</Text>
+        <View className="flex-col justify-center items-center gap-3">
+          <View className="rounded-full bg-green-100 p-4 flex justify-center items-center">
+            <Feather name="shopping-bag" size={30} color="green" />
+          </View>
+          <Text className="text-2xl text-center font-bold">Welcome Back!</Text>
+          <Text className="text-1xl text-center text-slate-600">Sign in to continue tracking your groceries.</Text>
+        </View>
         <View style={[styles.verticallySpaced, styles.mt20]}>
           <Text style={styles.label}>Email</Text>
-          <TextInput
-            className="text-black"
-            autoComplete="email"
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-            autoCapitalize="none"
-            style={styles.input}
-          />
+          <View className="flex-row justify-start items-center border border-gray-300 rounded-md">
+            <View className="p-2 flex justify-center items-center">
+              <Feather name="mail" size={20} color="green" />
+            </View>
+            <TextInput
+              className="text-black flex-1"
+              placeholder="Enter your email"
+              autoComplete="email"
+              onChangeText={(text) => setEmail(text)}
+              value={email}
+              autoCapitalize="none"
+              style={styles.input}
+            />
+          </View>
         </View>
         <View style={styles.verticallySpaced}>
           <Text style={styles.label}>Password</Text>
-          <TextInput
-            className="text-black"
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-            secureTextEntry={true}
-            autoCapitalize="none"
-            style={styles.input}
-          />
+          <View className="flex-row justify-start items-center border border-gray-300 rounded-md">
+            <View className="p-2 flex justify-center items-center">
+              <AntDesign name="lock" size={20} color="green" />
+            </View>
+            <TextInput
+              className="text-black flex-1"
+              placeholder="Enter your password"
+              onChangeText={(text) => setPassword(text)}
+              value={password}
+              secureTextEntry={securePassword}
+              autoCapitalize="none"
+              style={styles.input}
+            />
+            <TouchableOpacity onPress={() => setSecurePassword(!securePassword)} className="flex justify-center items-center w-[3rem]">
+              <Text>{securePassword ? <Feather name="eye-off" size={20} color="gray" /> : <Feather name="eye" size={20} color="gray" />}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={[styles.verticallySpaced, styles.mt20]}>
           <TouchableOpacity
@@ -114,7 +138,7 @@ export default function Login() {
           </Link>
         </View>
       </View>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingView >
   );
 }
 
@@ -134,13 +158,9 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#86939e",
     marginBottom: 6,
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#86939e",
-    borderRadius: 4,
     padding: 12,
     fontSize: 16,
   },

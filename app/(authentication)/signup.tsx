@@ -1,16 +1,20 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, View, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import React from 'react'
 import Signup from '@/components/auth/Signup';
+import { Entypo } from '@expo/vector-icons';
 
 const SignupScreen = () => {
   return (
     <SafeAreaView className='h-full flex justify-center'>
-      <View className='bg-green-400 h-[50%] absolute top-0 left-0 right-0' />
-        <View className=''>
-          <Text className='w-full text-center text-white text-6xl p-5'>Grocery Tracker</Text>
+      <ScrollView>
+        <View className='w-[60%] flex-col items-center justify-center m-auto mt-5 gap-3'>
+          <Text className='w-full text-center text-[#4CAF50] text-6xl font-semibold'>Grocery Tracker</Text>
+          <Text className='text-slate-600'>Track. Analyze. Eat Better.</Text>
+          <Entypo name="leaf" size={20} color="green" />
         </View>
         <Signup />
+      </ScrollView>
     </SafeAreaView>
   )
 }
