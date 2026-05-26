@@ -11,7 +11,6 @@ const ScreensLayout = () => {
     >
       <Stack.Screen name="addFood" />
       <Stack.Screen name="editFood" />
-      <Stack.Screen name='profileEdit' options={{ headerBackVisible: false, gestureEnabled: false }} />
       {/*
       <Stack.Screen name="foodInfo" />
       */}

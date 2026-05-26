@@ -2,14 +2,8 @@ import { useIsFocused } from "@react-navigation/native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
-import {
-  Alert,
-  Button,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 const CameraScreen = () => {
   const isFocused = useIsFocused();
@@ -42,7 +36,10 @@ const CameraScreen = () => {
         const photo = await cameraRef.current.takePictureAsync();
         router.push({ pathname: "/foodInfo", params: { photoURI: photo.uri } });
       } catch (e) {
-        Alert.alert("Unexpected Error Occurred");
+        Toast.show({
+          type: "error",
+          text1: "Unexpected Error Occurred",
+        });
         console.log("Error at takePicture():", e);
       } finally {
         setLoading(false);

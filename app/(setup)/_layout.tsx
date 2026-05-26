@@ -8,7 +8,10 @@ export default function SetupLayout() {
         contentStyle: { backgroundColor: "white" },
       }}
     >
-      <Stack.Screen name='profileEdit' options={{ headerBackVisible: false, gestureEnabled: false }} />
+      <Stack.Screen
+        name="profileEdit"
+        options={{ headerBackVisible: false, gestureEnabled: false }}
+      />
     </Stack>
   );
 }

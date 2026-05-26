@@ -4,7 +4,6 @@ import Feather from "@expo/vector-icons/Feather";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -13,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -51,7 +51,10 @@ export default function Login() {
       });
 
       if (error) {
-        Alert.alert(error.message);
+        Toast.show({
+          type: "error",
+          text1: "Account not found. Try signing up.",
+        });
         return;
       }
 

@@ -2,9 +2,9 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase";
 import Entypo from "@expo/vector-icons/Entypo";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 const Signout = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -14,7 +14,11 @@ const Signout = () => {
       setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) {
-        Alert.alert(error.message);
+        console.log(error);
+        Toast.show({
+          type: "error",
+          text1: "Unexpected Error Occurred",
+        });
         return;
       }
     } finally {

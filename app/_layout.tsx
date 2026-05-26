@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { Stack } from "expo-router";
 import { createContext, useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
+import Toast from "react-native-toast-message";
 
 // A context is used to keep track of username updates
 export const UserProfileContext = createContext<{
@@ -102,6 +103,7 @@ export default function RootLayout() {
           <Stack.Screen name="(screens)" options={{ headerShown: false }} />
         </Stack.Protected>
       </Stack>
+      <Toast />
     </UserProfileContext.Provider>
   );
 }

@@ -35,7 +35,7 @@ const FoodInfoScreen = () => {
   console.log(data);
   */
 
-  async function addToGroceries() { }
+  async function addToGroceries() {}
 
   return (
     <SafeAreaView className="flex-1">
