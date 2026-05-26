@@ -8,7 +8,6 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -17,6 +16,7 @@ import {
 } from "react-native";
 import { PieChart } from "react-native-gifted-charts";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 interface FoodData {
   calories: number;
@@ -75,13 +75,19 @@ const AnalyticsScreen = () => {
 
       if (error) {
         console.log(error);
-        Alert.alert("Unexpected Error Occurred");
+        Toast.show({
+          type: "error",
+          text1: "Unexpected Error Occurred",
+        });
       } else {
         setFoodData(data || []);
       }
     } catch (e) {
       console.log(e);
-      Alert.alert("Unexpected Error Occurred");
+      Toast.show({
+        type: "error",
+        text1: "Unexpected Error Occurred",
+      });
     }
   }
 
@@ -98,11 +104,17 @@ const AnalyticsScreen = () => {
         await getFoodData(user.id);
       } else {
         console.log(error);
-        Alert.alert("Unexpected Error Occurred");
+        Toast.show({
+          type: "error",
+          text1: "Unexpected Error Occurred",
+        });
       }
     } catch (e) {
       console.log(e);
-      Alert.alert("Unexpected Error Occurred");
+      Toast.show({
+        type: "error",
+        text1: "Unexpected Error Occurred",
+      });
     } finally {
       if (!isRefresh) setLoading(false);
     }

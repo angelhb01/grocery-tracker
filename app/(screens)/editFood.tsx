@@ -1,16 +1,16 @@
+import FoodItem from "@/components/FoodItem";
 import { supabase } from "@/lib/supabase";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FoodItem from "@/components/FoodItem";
+import Toast from "react-native-toast-message";
 
 interface GroceryDetails {
   productName: string;
@@ -29,7 +29,16 @@ const EditFoodScreen = () => {
   const [loading, setLoading] = useState(false);
   const [groceryData, setGroceryData] = useState<GroceryDetails | null>(null);
 
-  async function updateGroceries(productName: string, productDescription: string, productType: string, calories: string, fat: string, carbs: string, protein: string, quantity: string) {
+  async function updateGroceries(
+    productName: string,
+    productDescription: string,
+    productType: string,
+    calories: string,
+    fat: string,
+    carbs: string,
+    protein: string,
+    quantity: string,
+  ) {
     if (
       productName.trim() === "" ||
       productType.trim() === "" ||
@@ -40,7 +49,10 @@ const EditFoodScreen = () => {
       quantity.trim() === "" ||
       quantity === "0"
     ) {
-      Alert.alert("Please fill the required fields");
+      Toast.show({
+        type: "error",
+        text1: "Please fill the required fields",
+      });
       return;
     }
 
@@ -68,16 +80,25 @@ const EditFoodScreen = () => {
           .eq("uuid", user.id);
 
         if (error) {
-          Alert.alert("Unexpected Error Occurred");
+          Toast.show({
+            type: "error",
+            text1: "Unexpected Error Occurred",
+          });
           console.log(error);
         } else {
-          Alert.alert("Successfully Updated Groceries");
+          Toast.show({
+            type: "success",
+            text1: "Successfully Updated Groceries",
+          });
           router.back();
         }
       }
 
       if (error) {
-        Alert.alert("Unexpected Error Occurred");
+        Toast.show({
+          type: "error",
+          text1: "Unexpected Error Occurred",
+        });
         console.log(error);
       }
     } catch (e) {
@@ -109,8 +130,11 @@ const EditFoodScreen = () => {
         quantity: String(data.quantity),
       });
     } catch (e) {
-      Alert.alert("Unexpected Error Occurred")
-      console.log("Error in getGroceryDetails:", e)
+      Toast.show({
+        type: "error",
+        text1: "Unexpected Error Occurred",
+      });
+      console.log("Error in getGroceryDetails:", e);
     } finally {
       setLoading(false);
     }
@@ -133,9 +157,14 @@ const EditFoodScreen = () => {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
             <SafeAreaView className="flex-1">
-              <FoodItem title={"Edit Food Item"} loading={loading} addToGroceries={updateGroceries} groceryData={groceryData} />
+              <FoodItem
+                title={"Edit Food Item"}
+                loading={loading}
+                addToGroceries={updateGroceries}
+                groceryData={groceryData}
+              />
             </SafeAreaView>
-          </KeyboardAvoidingView >
+          </KeyboardAvoidingView>
         </>
       )}
     </View>

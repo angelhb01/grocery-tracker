@@ -6,7 +6,6 @@ import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   RefreshControl,
   ScrollView,
   Text,
@@ -14,6 +13,7 @@ import {
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 interface Groceries {
   id: number;
@@ -52,7 +52,10 @@ export default function Index() {
       setGroceries(data || []);
     } catch (e) {
       console.log(e);
-      Alert.alert("Error loading groceries");
+      Toast.show({
+        type: "error",
+        text1: "Error loading groceries",
+      });
     } finally {
       if (!isRefresh) setLoading(false);
     }
@@ -66,7 +69,10 @@ export default function Index() {
       setGroceries((prev) => prev.filter((item) => item.id !== id));
     } catch (e) {
       console.log(e);
-      Alert.alert("Unexpected Error Occurred");
+      Toast.show({
+        type: "error",
+        text1: "Unexpected Error Occurred",
+      });
     }
   }
 

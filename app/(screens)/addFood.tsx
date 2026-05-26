@@ -2,17 +2,23 @@ import FoodItem from "@/components/FoodItem";
 import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
 import { useState } from "react";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { KeyboardAvoidingView, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 const AddFoodScreen = () => {
   const [loading, setLoading] = useState(false);
 
-  async function addToGroceries(productName: string, productDescription: string, productType: string, calories: string, fat: string, carbs: string, protein: string, quantity: string) {
+  async function addToGroceries(
+    productName: string,
+    productDescription: string,
+    productType: string,
+    calories: string,
+    fat: string,
+    carbs: string,
+    protein: string,
+    quantity: string,
+  ) {
     if (
       productName.trim() === "" ||
       productType.trim() === "" ||
@@ -23,7 +29,10 @@ const AddFoodScreen = () => {
       quantity.trim() === "" ||
       quantity === "0"
     ) {
-      Alert.alert("Please fill the required fields");
+      Toast.show({
+        type: "error",
+        text1: "Please fill the required fields",
+      });
       return;
     }
 
@@ -50,16 +59,25 @@ const AddFoodScreen = () => {
         ]);
 
         if (error) {
-          Alert.alert("Unexpected Error Occurred");
+          Toast.show({
+            type: "error",
+            text1: "Unexpected Error Occurred",
+          });
           console.log(error);
         } else {
-          Alert.alert("Successfully Added to Groceries");
+          Toast.show({
+            type: "success",
+            text1: "Successfully Added to Groceries",
+          });
           router.back();
         }
       }
 
       if (error) {
-        Alert.alert("Unexpected Error Occurred");
+        Toast.show({
+          type: "error",
+          text1: "Unexpected Error Occurred",
+        });
         console.log(error);
       }
     } catch (e) {
@@ -69,18 +87,20 @@ const AddFoodScreen = () => {
     }
   }
 
-
   return (
     <KeyboardAvoidingView
       className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <SafeAreaView className="flex-1">
-        <FoodItem title={"Add Food Item"} loading={loading} addToGroceries={addToGroceries} />
+        <FoodItem
+          title={"Add Food Item"}
+          loading={loading}
+          addToGroceries={addToGroceries}
+        />
       </SafeAreaView>
-    </KeyboardAvoidingView >
+    </KeyboardAvoidingView>
   );
 };
 
 export default AddFoodScreen;
-

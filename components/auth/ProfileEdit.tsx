@@ -1,15 +1,14 @@
 import { UserProfileContext } from "@/app/_layout";
 import { supabase } from "@/lib/supabase";
-import { router } from "expo-router";
 import React, { useContext, useState } from "react";
 import {
-  Alert,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function ProfileEdit() {
   const [loading, setLoading] = useState(false);
@@ -30,7 +29,6 @@ export default function ProfileEdit() {
         return null;
       }
       if (user) {
-        console.log("Current user ID:", user.id);
         return user.id;
       } else {
         console.log("No user currently signed in");
@@ -49,7 +47,16 @@ export default function ProfileEdit() {
       lastName.trim() === "" ||
       username.trim() === ""
     ) {
-      Alert.alert("Invalid Credentials");
+      Toast.show({
+        type: "error",
+        text1: "Invalid Credentials",
+      });
+      return;
+    } else if (username.length < 6) {
+      Toast.show({
+        type: "error",
+        text1: "Username has to be at least 6 characters long.",
+      });
       return;
     }
 
@@ -59,7 +66,10 @@ export default function ProfileEdit() {
       const user_id = await getUserId();
 
       if (!user_id) {
-        Alert.alert("No user found");
+        Toast.show({
+          type: "error",
+          text1: "No user found",
+        });
         return;
       }
 
@@ -78,20 +88,26 @@ export default function ProfileEdit() {
       userProfileContext?.setUsername(username);
     } catch (error) {
       console.log(error);
-      Alert.alert("Failed to update profile");
+      Toast.show({
+        type: "error",
+        text1: "Failed to update profile",
+      });
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      className="bg-white border border-white shadow rounded-lg mx-4 p-5"
+    >
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Text style={styles.label}>First name</Text>
         <TextInput
           onChangeText={(text) => setFirstName(text)}
           value={firstName}
-          placeholder="John"
+          placeholder="Your first name"
           autoCapitalize="none"
           style={styles.input}
         />
@@ -101,7 +117,7 @@ export default function ProfileEdit() {
         <TextInput
           onChangeText={(text) => setLastName(text)}
           value={lastName}
-          placeholder="Doe"
+          placeholder="Your last name"
           autoCapitalize="none"
           style={styles.input}
         />
@@ -111,7 +127,7 @@ export default function ProfileEdit() {
         <TextInput
           onChangeText={(text) => setUsername(text)}
           value={username}
-          placeholder="johndoe123"
+          placeholder="Your username"
           autoCapitalize="none"
           style={styles.input}
         />
@@ -156,7 +172,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    backgroundColor: "#2089dc",
+    backgroundColor: "#2E8B57",
     borderRadius: 4,
     padding: 12,
     alignItems: "center",
