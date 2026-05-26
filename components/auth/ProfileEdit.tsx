@@ -1,6 +1,7 @@
+import { UserProfileContext } from "@/app/_layout";
 import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -40,6 +41,8 @@ export default function ProfileEdit() {
     }
   }
 
+  const userProfileContext = useContext(UserProfileContext);
+
   async function addUserDetails() {
     if (
       firstName.trim() === "" ||
@@ -70,7 +73,9 @@ export default function ProfileEdit() {
         .eq("id", user_id);
 
       if (error) throw error;
-      //router.replace("/(tabs)");
+
+      // Update the username data from the UserProfileContext in the root layout
+      userProfileContext?.setUsername(username);
     } catch (error) {
       console.log(error);
       Alert.alert("Failed to update profile");
