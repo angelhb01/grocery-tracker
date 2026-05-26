@@ -1,8 +1,13 @@
 import "@/global.css";
 import { supabase } from "@/lib/supabase";
 import { Stack } from "expo-router";
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
+
+// A context is used to keep track of username updates
+export const UserProfileContext = createContext<{
+  setUsername: (username: string | null) => void;
+} | null>(null);
 
 export default function RootLayout() {
   const [username, setUsername] = useState<string | null>(null);
@@ -45,9 +50,19 @@ export default function RootLayout() {
     initalize();
 
     // Keeps track if the session changes (if user logs out)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(!!session);
-    })
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const isActive = !!session;
+      if (isActive && session?.user) {
+        setLoading(true);
+        loadProfile(session.user.id).finally(() => setLoading(false));
+        setSession(true);
+      } else {
+        setSession(false);
+        setUsername(null);
+      }
+    });
     return () => {
       subscription.unsubscribe();
     };
@@ -65,35 +80,28 @@ export default function RootLayout() {
   const hasUsername = !!username;
 
   return (
-    <Stack>
-      { /* Not authenticated */}
-      <Stack.Protected guard={!hasSession}>
-        <Stack.Screen
-          name="(authentication)"
-          options={{ headerShown: false }}
-        />
-      </Stack.Protected>
+    <UserProfileContext.Provider value={{ setUsername }}>
+      <Stack>
+        {/* Not authenticated */}
+        <Stack.Protected guard={!hasSession}>
+          <Stack.Screen
+            name="(authentication)"
+            options={{ headerShown: false }}
+          />
+        </Stack.Protected>
 
-      { /* authenticated but no profile */}
-      <Stack.Protected guard={hasSession && !hasUsername}>
-        <Stack.Screen
-          name="(setup)"
-          options={{ headerShown: false }}
-        />
-      </Stack.Protected>
+        {/* authenticated but no profile */}
+        <Stack.Protected guard={hasSession && !hasUsername}>
+          <Stack.Screen name="(setup)" options={{ headerShown: false }} />
+        </Stack.Protected>
 
-      { /* Both authenticated and has a profile */}
-      <Stack.Protected guard={hasSession && hasUsername}>
-        <Stack.Screen
-          name="(tabs)"
-          options={{ headerShown: false }}
-        />
+        {/* Both authenticated and has a profile */}
+        <Stack.Protected guard={hasSession && hasUsername}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        <Stack.Screen
-          name="(screens)"
-          options={{ headerShown: false }}
-        />
-      </Stack.Protected>
-    </Stack>
+          <Stack.Screen name="(screens)" options={{ headerShown: false }} />
+        </Stack.Protected>
+      </Stack>
+    </UserProfileContext.Provider>
   );
 }

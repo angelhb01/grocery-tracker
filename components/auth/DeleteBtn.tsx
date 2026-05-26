@@ -1,10 +1,10 @@
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, StyleSheet, Text, View } from "react-native";
+import { supabase } from "../../lib/supabase";
 import { Button, ButtonText } from "../ui/button";
-import { supabase } from '../../lib/supabase'
-import { useRouter } from "expo-router";
 
 export default function DeleteBtn() {
   const [loading, setLoading] = useState(false);
@@ -16,9 +16,9 @@ export default function DeleteBtn() {
     try {
       const { data } = await supabase.auth.getUser();
       const userId = data.user?.id;
-      const { error } = await supabase.functions.invoke('delete-user', {
-        body: { userId: userId }
-      })
+      const { error } = await supabase.functions.invoke("delete-user", {
+        body: { userId: userId },
+      });
       console.log("UserId", userId);
 
       if (error) {
@@ -43,7 +43,7 @@ export default function DeleteBtn() {
         }
       } else {
         await supabase.auth.signOut();
-        router.replace("/(authentication)/login");
+        router.replace("/login");
         Alert.alert("Successfully deleted your account");
       }
     } catch (e) {

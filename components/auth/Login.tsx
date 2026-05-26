@@ -1,4 +1,6 @@
 import { supabase } from "@/lib/supabase";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Feather from "@expo/vector-icons/Feather";
 import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -11,8 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Feather from '@expo/vector-icons/Feather';
-import AntDesign from '@expo/vector-icons/AntDesign';
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -24,18 +24,18 @@ export default function Login() {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select()
-        .eq("id", user_id);
+        .select("username")
+        .eq("id", user_id)
+        .single();
 
       if (error) {
         console.log(error.message);
-        return;
-      } else {
-        return data;
+        return null;
       }
+      return data;
     } catch (error) {
       console.log("An unknown error occurred:", error);
-      return;
+      return null;
     }
   }
 
@@ -49,17 +49,17 @@ export default function Login() {
         email: email,
         password: password,
       });
-      const onboardingData = await onboarding(user?.id);
 
       if (error) {
         Alert.alert(error.message);
-      } else if (
-        onboardingData![0].username === null ||
-        onboardingData![0].username === ""
-      ) {
-        router.replace("/(authentication)/profileEdit");
+        return;
+      }
+
+      const onboardingData = await onboarding(user?.id);
+      if (!onboardingData || !onboardingData.username) {
+        router.replace("/profileEdit");
       } else {
-        router.replace("/(tabs)");
+        router.replace("/");
       }
     } finally {
       setLoading(false);
@@ -80,7 +80,9 @@ export default function Login() {
             <Feather name="shopping-bag" size={30} color="green" />
           </View>
           <Text className="text-2xl text-center font-bold">Welcome Back!</Text>
-          <Text className="text-1xl text-center text-slate-600">Sign in to continue tracking your groceries.</Text>
+          <Text className="text-1xl text-center text-slate-600">
+            Sign in to continue tracking your groceries.
+          </Text>
         </View>
         <View style={[styles.verticallySpaced, styles.mt20]}>
           <Text style={styles.label}>Email</Text>
@@ -114,8 +116,17 @@ export default function Login() {
               autoCapitalize="none"
               style={styles.input}
             />
-            <TouchableOpacity onPress={() => setSecurePassword(!securePassword)} className="flex justify-center items-center w-[3rem]">
-              <Text>{securePassword ? <Feather name="eye-off" size={20} color="gray" /> : <Feather name="eye" size={20} color="gray" />}</Text>
+            <TouchableOpacity
+              onPress={() => setSecurePassword(!securePassword)}
+              className="flex justify-center items-center w-[3rem]"
+            >
+              <Text>
+                {securePassword ? (
+                  <Feather name="eye-off" size={20} color="gray" />
+                ) : (
+                  <Feather name="eye" size={20} color="gray" />
+                )}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -138,7 +149,7 @@ export default function Login() {
           </Link>
         </View>
       </View>
-    </KeyboardAvoidingView >
+    </KeyboardAvoidingView>
   );
 }
 
