@@ -1,7 +1,7 @@
 import "@/global.css";
 import { supabase } from "@/lib/supabase";
 import { Stack } from "expo-router";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -14,6 +14,7 @@ export default function RootLayout() {
   const [username, setUsername] = useState<string | null>(null);
   const [session, setSession] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
+  const lastSessionUserId = useRef<string | null>(null);
 
   async function loadProfile(userId: string) {
     const { data, error } = await supabase
@@ -50,16 +51,28 @@ export default function RootLayout() {
 
     initalize();
 
-    // Keeps track if the session changes (if user logs out)
+    // Keeps track if the session changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "TOKEN_REFRESHED") {
+        return;
+      }
+
+      const currentUserId = session?.user?.id ?? null;
       const isActive = !!session;
+
+      if (isActive && currentUserId === lastSessionUserId.current) {
+        return;
+      }
+
       if (isActive && session?.user) {
+        lastSessionUserId.current = session.user.id;
         setLoading(true);
         loadProfile(session.user.id).finally(() => setLoading(false));
         setSession(true);
       } else {
+        lastSessionUserId.current = null;
         setSession(false);
         setUsername(null);
       }
