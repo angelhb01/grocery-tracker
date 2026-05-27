@@ -53,7 +53,7 @@ export default function Login() {
       if (error) {
         Toast.show({
           type: "error",
-          text1: "Account not found. Try signing up.",
+          text1: error.message,
         });
         return;
       }
