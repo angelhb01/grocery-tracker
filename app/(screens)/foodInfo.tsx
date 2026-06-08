@@ -2,40 +2,64 @@ import { Button, ButtonText } from "@/components/ui/button";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const FoodInfoScreen = () => {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { photoURI } = useLocalSearchParams();
 
   useEffect(() => {
-    console.log(photoURI);
+    // If the photoURI is an array, grab the first item. Otherwise, use it.
+    const uri = Array.isArray(photoURI) ? photoURI[0] : photoURI;
+    if (!uri) return;
+
+    const callModel = async () => {
+      try {
+        const formData = new FormData();
+
+        // If the user is using a web browser, we need to fetch the image as a blob
+        if (Platform.OS === "web") {
+          const response = await fetch(uri);
+          const blob = await response.blob();
+
+          formData.append("file", blob, "photo.jpg");
+        } else {
+          // Otherwise, the user is using a mobile device, so we use the uri directly
+          formData.append("file", {
+            uri,
+            name: "photo.jpg",
+            type: "image/jpeg",
+          } as any);
+        }
+
+        // Fetch response from the server (development)
+        const response = await fetch(
+          Platform.OS === "web"
+            ? "http://localhost:8000/predict"
+            : `http://${process.env.EXPO_PUBLIC_API_URL}:8000/predict`,
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
+
+        const data = await response.json();
+        console.log("Server response:", data);
+      } catch (e) {
+        console.log("Upload error:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    callModel();
   }, []);
 
-  /*
-  // Send request to the model
-  const formData = new FormData();
-
-  formData.append("file", {
-    uri: photo.uri,
-    name: "photo.jpg",
-    type: "image/jpeg",
-  });
-
-  const response = await fetch("http://localhost:8000/predict", {
-    method: "POST",
-    body: formData,
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-
-  const data = await response.json();
-  console.log(data);
-  */
-
   async function addToGroceries() {}
+
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <SafeAreaView className="flex-1">

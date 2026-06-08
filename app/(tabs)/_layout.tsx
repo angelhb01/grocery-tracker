@@ -30,7 +30,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="camera"
         options={{
-          href: null,
           title: "",
           tabBarActiveTintColor: "#008000",
           tabBarIcon: ({ color }) => (
