@@ -2,23 +2,34 @@ import io
 import json
 import os
 from collections import defaultdict
+from time import sleep
 
 import requests
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 from ultralytics import YOLO
 
 load_dotenv()
+
+# A rate limiter to prevent server overload
+limiter = Limiter(key_func=get_remote_address)
+app = FastAPI()
+app.state.limiter = limiter
+app.add_exception_handler(
+    RateLimitExceeded,
+    _rate_limit_exceeded_handler,  # type: ignore[arg-type]
+)
 
 # load the model
 model = YOLO("../runs/detect/train/weights/best.pt")
 
 
 def main():
-    app = FastAPI()
-
     # Middleware
     app.add_middleware(
         CORSMiddleware,
@@ -30,7 +41,8 @@ def main():
 
     # Endpoints
     @app.post("/predict")
-    async def predict(file: UploadFile = File(...)):
+    @limiter.limit("5/minute")
+    async def predict(request: Request, file: UploadFile = File(...)):
         # Read image bytes
         image_bytes = await file.read()
 
@@ -64,7 +76,9 @@ def main():
                 params["query"] = food_item["name"]
                 res = requests.get(url, params=params).json()
                 nutrients = res["foods"][0]["foodNutrients"]
+                sleep(2)
                 for nutrient in nutrients:
+                    food_items[food_item["name"]]["name"] = food_item["name"]
                     nutrient_name = nutrient["nutrientName"].lower()
 
                     if "fat" in nutrient_name:
@@ -86,4 +100,4 @@ def main():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(main, host="0.0.0.0", port=8000)
+    uvicorn.run("main:main", host="0.0.0.0", port=8000, reload=True)
