@@ -3,3 +3,9 @@
 
 # Cache
 /__pycache__
+
+# Data
+/Data
+
+# Environment variables
+/.env
