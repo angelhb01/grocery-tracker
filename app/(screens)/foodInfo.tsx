@@ -19,8 +19,8 @@ interface Food {
 }
 
 const FoodInfoScreen = () => {
-  const API_MOBILE = process.env.API_MOBILE;
-  const API_WEB = process.env.API_WEB;
+  const API_MOBILE = process.env.EXPO_PUBLIC_API_MOBILE;
+  const API_WEB = process.env.EXPO_PUBLIC_API_WEB;
 
   const [loading, setLoading] = useState(true);
   const [foodData, setFoodData] = useState<Food>({});
