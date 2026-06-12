@@ -5,8 +5,22 @@ import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+interface FoodStats {
+  name: string;
+  fat: number;
+  protein: number;
+  carbs: number;
+  calories: number;
+  quantity: number;
+}
+
+interface Food {
+  [key: string]: FoodStats;
+}
+
 const FoodInfoScreen = () => {
   const [loading, setLoading] = useState(true);
+  const [foodData, setFoodData] = useState<Food>({});
   const { photoURI } = useLocalSearchParams();
 
   useEffect(() => {
@@ -45,6 +59,7 @@ const FoodInfoScreen = () => {
         );
 
         const data = await response.json();
+        setFoodData(data);
         console.log("Server response:", data);
       } catch (e) {
         console.log("Upload error:", e);
@@ -78,11 +93,18 @@ const FoodInfoScreen = () => {
 
       {/* Nutrition information */}
       <View>
-        <Text>Name:</Text>
-        <Text>Calories:</Text>
-        <Text>Fat:</Text>
-        <Text>Carbs:</Text>
-        <Text>Protein:</Text>
+        {Object.entries(foodData).map(([key, item]) => {
+          return (
+            <View key={key}>
+              <Text>Name: {item.name}</Text>
+              <Text>Calories: {item.calories}</Text>
+              <Text>Fat: {item.fat}g</Text>
+              <Text>Carbs: {item.carbs}g</Text>
+              <Text>Protein: {item.protein}g</Text>
+              <Text>Quantity: {item.quantity}</Text>
+            </View>
+          );
+        })}
       </View>
 
       <View>

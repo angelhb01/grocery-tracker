@@ -2,6 +2,7 @@ import io
 import json
 import os
 from collections import defaultdict
+from pathlib import Path
 from time import sleep
 
 import requests
@@ -26,78 +27,74 @@ app.add_exception_handler(
 )
 
 # load the model
-model = YOLO("../runs/detect/train/weights/best.pt")
+MODEL_PATH = (
+    Path(__file__).parent.parent / "runs" / "detect" / "train" / "weights" / "best.pt"
+)
+print("Loading model...")
+model = YOLO(str(MODEL_PATH))
+print("Model loaded!")
+
+# Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    # allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
-def main():
-    # Middleware
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        # allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+# Endpoints
+@app.post("/predict")
+@limiter.limit("5/minute")
+async def predict(request: Request, file: UploadFile = File(...)):
+    # Read image bytes
+    image_bytes = await file.read()
 
-    # Endpoints
-    @app.post("/predict")
-    @limiter.limit("5/minute")
-    async def predict(request: Request, file: UploadFile = File(...)):
-        # Read image bytes
-        image_bytes = await file.read()
+    # convert bytes to PIL image
+    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
-        # convert bytes to PIL image
-        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    # run inference
+    results = model(image)
 
-        # run inference
-        results = model(image)
+    # return results[0].to_json()
+    # Food API to query food data
+    url = "https://api.nal.usda.gov/fdc/v1/foods/search"
+    params = {
+        "api_key": os.getenv("FOOD_API"),
+        "pageNumber": 1,
+        "pageSize": 1,
+        "dataType": "Foundation",
+    }
 
-        # return results[0].to_json()
-        # Food API to query food data
-        url = "https://api.nal.usda.gov/fdc/v1/foods/search"
-        params = {
-            "api_key": os.getenv("FOOD_API"),
-            "pageNumber": 1,
-            "pageSize": 1,
-            "dataType": "Foundation",
-        }
+    # A dictionary that will keep track of food items
+    food_items = defaultdict(dict)
 
-        # A dictionary that will keep track of food items
-        food_items = defaultdict(dict)
+    # Send a request to the food API
+    for food_item in json.loads(results[0].to_json()):
+        # If the food item exists in the dictionary, increase the quantity.
+        if food_item["name"] in food_items:
+            food_items[food_item["name"]]["quantity"] += 1
 
-        # Send a request to the food API
-        for food_item in json.loads(results[0].to_json()):
-            # If the food item exists in the dictionary, increase the quantity.
-            if food_item["name"] in food_items:
-                food_items[food_item["name"]]["quantity"] += 1
+        # Otherwise, fetch nutrition data from the api and add it to the dictionary.
+        else:
+            params["query"] = food_item["name"]
+            res = requests.get(url, params=params).json()
+            nutrients = res["foods"][0]["foodNutrients"]
+            sleep(2)
+            for nutrient in nutrients:
+                food_items[food_item["name"]]["name"] = food_item["name"]
+                nutrient_name = nutrient["nutrientName"].lower()
 
-            # Otherwise, fetch nutrition data from the api and add it to the dictionary.
-            else:
-                params["query"] = food_item["name"]
-                res = requests.get(url, params=params).json()
-                nutrients = res["foods"][0]["foodNutrients"]
-                sleep(2)
-                for nutrient in nutrients:
-                    food_items[food_item["name"]]["name"] = food_item["name"]
-                    nutrient_name = nutrient["nutrientName"].lower()
+                if "fat" in nutrient_name:
+                    food_items[food_item["name"]]["fat"] = nutrient["value"]
+                elif "carbohydrate" in nutrient_name:
+                    food_items[food_item["name"]]["carbs"] = nutrient["value"]
+                elif "protein" in nutrient_name:
+                    food_items[food_item["name"]]["protein"] = nutrient["value"]
+                elif "energy" in nutrient_name or "kcal" in nutrient_name:
+                    food_items[food_item["name"]]["calories"] = nutrient["value"]
 
-                    if "fat" in nutrient_name:
-                        food_items[food_item["name"]]["fat"] = nutrient["value"]
-                    elif "carbohydrate" in nutrient_name:
-                        food_items[food_item["name"]]["carbs"] = nutrient["value"]
-                    elif "protein" in nutrient_name:
-                        food_items[food_item["name"]]["protein"] = nutrient["value"]
-                    elif "energy" in nutrient_name or "kcal" in nutrient_name:
-                        food_items[food_item["name"]]["calories"] = nutrient["value"]
-
-                food_items[food_item["name"]]["quantity"] = 1
-        print("Confirm food_items:", food_items)
-        return food_items
-
-    return app
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run("main:main", host="0.0.0.0", port=8000, reload=True)
+            food_items[food_item["name"]]["quantity"] = 1
+    print("Confirm food_items:", food_items)
+    return food_items
