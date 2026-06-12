@@ -19,6 +19,9 @@ interface Food {
 }
 
 const FoodInfoScreen = () => {
+  const API_MOBILE = process.env.API_MOBILE;
+  const API_WEB = process.env.API_WEB;
+
   const [loading, setLoading] = useState(true);
   const [foodData, setFoodData] = useState<Food>({});
   const { photoURI } = useLocalSearchParams();
@@ -49,9 +52,7 @@ const FoodInfoScreen = () => {
 
         // Fetch response from the server (development)
         const response = await fetch(
-          Platform.OS === "web"
-            ? "http://localhost:8000/predict"
-            : `http://${process.env.EXPO_PUBLIC_API_URL}:8000/predict`,
+          Platform.OS === "web" ? "" + API_WEB : "" + API_MOBILE,
           {
             method: "POST",
             body: formData,
