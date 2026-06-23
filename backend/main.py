@@ -43,7 +43,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Endpoints
 @app.post("/predict")
 @limiter.limit("5/minute")
@@ -68,33 +67,42 @@ async def predict(request: Request, file: UploadFile = File(...)):
     }
 
     # A dictionary that will keep track of food items
-    food_items = defaultdict(dict)
+    food_items = []
 
     # Send a request to the food API
     for food_item in json.loads(results[0].to_json()):
-        # If the food item exists in the dictionary, increase the quantity.
-        if food_item["name"] in food_items:
-            food_items[food_item["name"]]["quantity"] += 1
+        item_name = food_item["name"]
 
-        # Otherwise, fetch nutrition data from the api and add it to the dictionary.
-        else:
-            params["query"] = food_item["name"]
-            res = requests.get(url, params=params).json()
-            nutrients = res["foods"][0]["foodNutrients"]
-            sleep(2)
-            for nutrient in nutrients:
-                food_items[food_item["name"]]["name"] = food_item["name"]
-                nutrient_name = nutrient["nutrientName"].lower()
+        # If the food item exists in the list, increase the quantity.
+        existing_item = next(
+            (item for item in food_items if item.get("name") == item_name),
+            None,
+        )
 
-                if "fat" in nutrient_name:
-                    food_items[food_item["name"]]["fat"] = nutrient["value"]
-                elif "carbohydrate" in nutrient_name:
-                    food_items[food_item["name"]]["carbs"] = nutrient["value"]
-                elif "protein" in nutrient_name:
-                    food_items[food_item["name"]]["protein"] = nutrient["value"]
-                elif "energy" in nutrient_name or "kcal" in nutrient_name:
-                    food_items[food_item["name"]]["calories"] = nutrient["value"]
+        if existing_item is not None:
+            existing_item["quantity"] = existing_item.get("quantity", 1) + 1
+            continue
 
-            food_items[food_item["name"]]["quantity"] = 1
+        # Otherwise, fetch nutrition data from the api and add it to the list.
+        params["query"] = item_name
+        res = requests.get(url, params=params).json()
+        nutrients = res["foods"][0].get("foodNutrients", [])
+        sleep(2)
+
+        item_data = {"name": item_name, "quantity": 1}
+
+        for nutrient in nutrients:
+            nutrient_name = nutrient["nutrientName"].lower()
+
+            if "fat" in nutrient_name:
+                item_data["fat"] = nutrient["value"]
+            elif "carbohydrate" in nutrient_name:
+                item_data["carbs"] = nutrient["value"]
+            elif "protein" in nutrient_name:
+                item_data["protein"] = nutrient["value"]
+            elif "energy" in nutrient_name or "kcal" in nutrient_name:
+                item_data["calories"] = nutrient["value"]
+        food_items.append(item_data)
+
     print("Confirm food_items:", food_items)
     return food_items
