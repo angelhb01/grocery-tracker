@@ -11,6 +11,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
+import handleTextChange from "@/utils/handleTextChange";
 
 interface GroceryDetails {
   productName: string;
@@ -69,11 +70,6 @@ const FoodItem = ({
     groceryData?.productType || "",
   );
 
-  function handleTextChange(text: string) {
-    let numericValue = text.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1");
-    return numericValue;
-  }
-
   return (
     <>
       <ScrollView contentContainerClassName="flex-col justify-center mt-5 mx-5 gap-7 pb-5 flex-grow">
@@ -81,7 +77,7 @@ const FoodItem = ({
           <View className="flex-row w-full">
             <Button
               className="rounded-full absolute bg-green-100 w-[3rem] h-[3rem] flex justify-center items-center p-0"
-              onPress={() => router.replace('/(tabs)')}
+              onPress={() => router.replace("/(tabs)")}
             >
               <Ionicons name="arrow-back-outline" size={20} color="#008000" />
             </Button>
