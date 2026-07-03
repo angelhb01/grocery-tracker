@@ -38,6 +38,11 @@ To learn more about developing your project with Expo, look at the following res
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
+## Where I got my data
+https://universe.roboflow.com/wei-tq4ff/grocery-detection-vud86
+
+Food detection is limited due to imbalance and limited data across categories.
+
 ## Production URL
 
 Below is the final production app that's ran in the web
