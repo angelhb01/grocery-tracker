@@ -57,7 +57,6 @@ async def predict(request: Request, file: UploadFile = File(...)):
     with torch.no_grad():
         results = model(image)
 
-    # return results[0].to_json()
     # Food API to query food data
     url = "https://api.nal.usda.gov/fdc/v1/foods/search"
     params = {
@@ -88,7 +87,6 @@ async def predict(request: Request, file: UploadFile = File(...)):
         # Otherwise, fetch nutrition data from the api and add it to the list.
         params["query"] = item_name
         res = requests.get(url, params=params).json()
-        print("Res:", res)
         nutrients = res["foods"][0].get("foodNutrients", []) if res["foods"] else None
         if nutrients == None: 
             continue
@@ -116,5 +114,4 @@ async def predict(request: Request, file: UploadFile = File(...)):
                 item_data["calories"] = nutrient["value"]
         food_items.append(item_data)
 
-    print("Confirm food_items:", food_items)
     return food_items
