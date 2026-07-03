@@ -1,4 +1,5 @@
 import { Button, ButtonText } from "@/components/ui/button";
+import { handleTextChange } from "@/utils/foodHelper";
 import {
   Feather,
   FontAwesome6,
@@ -11,7 +12,6 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import handleTextChange from "@/utils/handleTextChange";
 
 interface GroceryDetails {
   productName: string;
@@ -226,7 +226,7 @@ const FoodItem = ({
                 </View>
                 <TextInput
                   className="text-black p-1 h-full flex-1"
-                  keyboardType="decimal-pad"
+                  keyboardType="number-pad"
                   value={quantity}
                   onChangeText={(text) => setQuantity(handleTextChange(text))}
                   autoCapitalize="none"

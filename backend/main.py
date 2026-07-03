@@ -1,7 +1,6 @@
 import io
 import json
 import os
-from collections import defaultdict
 from pathlib import Path
 from time import sleep
 
@@ -72,24 +71,35 @@ async def predict(request: Request, file: UploadFile = File(...)):
     # Send a request to the food API
     for food_item in json.loads(results[0].to_json()):
         item_name = food_item["name"]
+        quantity = int(food_item.get("quantity", 1))
 
         # If the food item exists in the list, increase the quantity.
         existing_item = next(
-            (item for item in food_items if item.get("name") == item_name),
+            (item for item in food_items if item.get("product_name") == item_name),
             None,
         )
 
         if existing_item is not None:
-            existing_item["quantity"] = existing_item.get("quantity", 1) + 1
+            existing_item["quantity"] = existing_item.get("quantity", 1) + quantity
             continue
 
         # Otherwise, fetch nutrition data from the api and add it to the list.
         params["query"] = item_name
         res = requests.get(url, params=params).json()
-        nutrients = res["foods"][0].get("foodNutrients", [])
+        print("Res:", res)
+        nutrients = res["foods"][0].get("foodNutrients", []) if res["foods"] else None
+        if nutrients == None: 
+            continue
         sleep(2)
 
-        item_data = {"name": item_name, "quantity": 1}
+        item_data = {"product_name": item_name, 
+                     "product_desc": "",
+                     "product_type": "generic",
+                     "calories": 0, 
+                     "carbs": 0, 
+                     "fat": 0, 
+                     "protein": 0, 
+                     "quantity": quantity}
 
         for nutrient in nutrients:
             nutrient_name = nutrient["nutrientName"].lower()
