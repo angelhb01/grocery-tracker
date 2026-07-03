@@ -13,6 +13,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from ultralytics import YOLO
+import torch
 
 load_dotenv()
 
@@ -53,7 +54,8 @@ async def predict(request: Request, file: UploadFile = File(...)):
     image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
 
     # run inference
-    results = model(image)
+    with torch.no_grad():
+        results = model(image)
 
     # return results[0].to_json()
     # Food API to query food data
