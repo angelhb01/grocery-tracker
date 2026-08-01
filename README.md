@@ -33,4 +33,4 @@ Below is the final production app that's ran in the web
 Production URL: https://grocery-tracker.expo.app/
 
 ## Current issue with food detection
-Due to limited memory in my hosting provider, the model may be able to collect user input depending on memory usage, so it may or may not work.
+Due to limited memory in my hosting provider, the model may be able to collect user input depending on memory usage, so it may or may not work. Also, interacting with the database may not work. I would have to re-enable the database once every week since I'm not using a paid subscription.
