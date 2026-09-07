@@ -94,6 +94,7 @@ Never commit either file. The repository's `.gitignore` already excludes `.env` 
 
 Create a Supabase project, then apply the SQL files in [`supabase/migrations`](supabase/migrations). The schema creates:
 
+
 - `profiles`, linked one-to-one with authenticated users;
 - `groceries`, containing grocery item, quantity, and nutrition fields; and
 - row-level-security policies that restrict each user to their own profile and groceries.
@@ -178,12 +179,24 @@ supabase/migrations/    Database schema and security migrations
 | `npm run lint` | Run Expo's ESLint configuration |
 
 ## Current limitations and next steps
+=======
+## Where I got my data
+https://universe.roboflow.com/wei-tq4ff/grocery-detection-vud86
+
+Food detection is limited due to imbalance and limited data across categories.
+
 
 - There is no automated retraining, model registry, or production model-monitoring pipeline yet.
 - Future work includes caching nutrition lookups, containerized deployment, dataset versioning, and feedback-driven model improvements.
 
 ## Security notes
 
+
 - Keep `FOOD_API` only on the backend; it is a server-side secret.
 - Never use a Supabase service-role key in the Expo app. The client should use only the anon key shown above.
 - Confirm Supabase Row Level Security remains enabled when changing the schema.
+=======
+Production URL: https://grocery-tracker.expo.app/
+
+## Current issue with food detection
+Due to limited memory in my hosting provider, the model may be able to collect user input depending on memory usage, so it may or may not work. Also, interacting with the database may not work. I would have to re-enable the database once every week since I'm not using a paid subscription.
